@@ -33,12 +33,13 @@ struct ag_gui
 };
 
 struct ag_gui_elem* ag_gui_elem_new();
+struct ag_gui_elem* ag_gui_elem_new_from_file(char* fname);
 void ag_gui_elem_add_child(struct ag_gui_elem* elem, struct ag_gui_elem* child);
 void ag_gui_elem_debug(struct ag_gui_elem* elem);
 char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type);
 void ag_gui_elem_manage_layout(struct ag_gui_elem* elem);
 
 struct ag_gui_elem* ag_gui_new(char* fname);
-void ag_surface_draw_gui(struct ag_surface* surface, struct ag_gui* gui);
+void ag_surface_draw_gui_elem(struct ag_surface* surface, struct ag_gui_elem* gui);
 
 #endif
