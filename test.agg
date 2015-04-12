@@ -1,0 +1,11 @@
+hpanel
+	vpanel
+		button
+			label
+				text=Yay
+		button
+			label
+				text=Nay :o
+	button
+		label
+			text=aoeui aoeuiBig button!
