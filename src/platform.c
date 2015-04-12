@@ -20,11 +20,11 @@ void ag_platform_uninit()
 #ifdef PLATFORM_WIN32
 LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	struct ag_window* window = (struct ag_window*)GetWindowLongPtr(hwnd, GWL_USERDATA);
+	struct ag_window* window = (struct ag_window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	switch(msg)
 	{
 	case WM_CREATE:
-		SetWindowLongPtr(hwnd, GWL_USERDATA, (LONG_PTR)((LPCREATESTRUCT)lparam)->lpCreateParams);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)((LPCREATESTRUCT)lparam)->lpCreateParams);
 		break;
 	case WM_DESTROY:
 		ag_event_push(ag_event_close_new(window));
