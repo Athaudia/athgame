@@ -26,17 +26,6 @@ struct mystate
 
 void* mystate_enter()
 {
-	/*FT_Library ft;
-	FT_Face face;
-	uint32_t idx;
-	FT_Init_FreeType(&ft);
-	FT_New_Face(ft, "fonts/Quicksand-Bold.otf", 0, &face);
-	FT_Set_Char_Size(face, 0, 14*64*2, 0, 0);
-	idx = FT_Get_Char_Index(face, 0xc5);
-	FT_Load_Glyph(face, idx, 0);
-	FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-	printf("%u\n", idx);
-	*/
 
 	struct mystate* mystate = (struct mystate*)malloc(sizeof(struct mystate));
 	mystate->bg = ag_surface_new_from_file("mario.bmp");
