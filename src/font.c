@@ -108,4 +108,3 @@ struct ag_vec2i ag_font_text_size(struct ag_font* font, char* text)
 	}
 	return ag_vec2i_div(size, 64);
 }
-

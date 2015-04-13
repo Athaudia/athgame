@@ -168,4 +168,3 @@ void ag_surface_draw_line_aa(struct ag_surface* img, struct ag_vec2i start, stru
 #undef fpart_
 #undef round_
 #undef rfpart_
-
