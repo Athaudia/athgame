@@ -22,6 +22,7 @@ struct ag_font
 extern FT_Library ag_ft;
 
 struct ag_font* ag_font_new(char* fname, int size);
+struct ag_font* ag_font_new_from_memory(FT_Byte* data, int data_size, int size);
 void ag_font_destroy(struct ag_font* font);
 struct ag_vec2i ag_font_text_size(struct ag_font*, char* text);
 

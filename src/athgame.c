@@ -3,6 +3,8 @@
 #include "platform.h"
 #include "font.h"
 #include "gui.h"
+#include "quicksand_regular.h"
+
 
 void ag_init()
 {
@@ -11,7 +13,7 @@ void ag_init()
 	ag_event_queue = 0;
 	ag_platform_init();
 	FT_Init_FreeType(&ag_ft);
-	ag_font_default = ag_font_new("fonts/Quicksand-Regular.otf", 12);
+	ag_font_default = ag_font_new_from_memory(ag_quicksand_regular, ag_quicksand_regular_size, 12);
 }
 
 void ag_uninit()

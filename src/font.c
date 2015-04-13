@@ -30,6 +30,36 @@ struct ag_font* ag_font_new(char* fname, int size)
 	return font;
 }
 
+
+struct ag_font* ag_font_new_from_memory(FT_Byte* data, int data_size, int size)
+{
+	struct ag_font* font = (struct ag_font*)malloc(sizeof(struct ag_font));
+	FT_Face face;
+	FT_New_Memory_Face(ag_ft, data, data_size, 0, &face);
+
+	FT_Set_Char_Size(face, 0, size*64, 0, 0);
+//	font->line_height_ft = size*64; //face->height acting up... workaround
+	font->line_height_ft = face->height;
+	font->line_height = font->line_height_ft/64;
+	font->ascender = face->ascender/64;
+	for(int i = 0; i < 256; ++i)
+	{
+		uint32_t idx = FT_Get_Char_Index(face, i);
+		if(idx)
+		{
+			FT_Load_Glyph(face, idx, 0);
+			FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+			font->glyphs[i] = (struct ag_glyph*)malloc(sizeof(struct ag_glyph));
+			font->glyphs[i]->surface = ag_surface_new_from_ft_bitmap(&face->glyph->bitmap);
+			font->glyphs[i]->advance = face->glyph->metrics.horiAdvance;
+			font->glyphs[i]->bearing = ag_vec2i(face->glyph->metrics.horiBearingX, -face->glyph->metrics.horiBearingY);			
+		}
+		else
+			font->glyphs[i] = 0;
+	}
+	return font;
+}
+
 void ag_font_destroy(struct ag_font* font)
 {
 	for(int i = 0; i < 256; ++i)
