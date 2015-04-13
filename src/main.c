@@ -15,7 +15,6 @@
 
 
 
-
 struct mystate
 {
 	struct ag_surface* bg;
