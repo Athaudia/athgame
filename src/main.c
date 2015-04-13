@@ -29,7 +29,6 @@ void* mystate_enter()
 
 	struct mystate* mystate = (struct mystate*)malloc(sizeof(struct mystate));
 	mystate->bg = ag_surface_new_from_file("mario.bmp");
-	mystate->font = ag_font_new("fonts/Quicksand-Regular.otf", 12);
 	mystate->tick = 0;
 	mystate->gui = ag_gui_elem_new_from_file("test.agg");
 	return mystate;
