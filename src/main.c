@@ -19,7 +19,7 @@ struct mystate
 {
 	struct ag_surface* bg;
 	struct ag_font* font;
-	struct ag_gui_elem* gui;
+	struct ag_gui* gui;
 	int tick;
 };
 
@@ -29,7 +29,7 @@ void* mystate_enter()
 	struct mystate* mystate = (struct mystate*)malloc(sizeof(struct mystate));
 	mystate->bg = ag_surface_new_from_file("mario.bmp");
 	mystate->tick = 0;
-	mystate->gui = ag_gui_elem_new_from_file("test.agg");
+	mystate->gui = ag_gui_new_from_file("test.agg");
 	return mystate;
 }
 
@@ -39,10 +39,10 @@ void mystate_render(void* data, struct ag_window* window)
 	
 	struct mystate* mystate = (struct mystate*)data;
 
-	mystate->gui->design_size = window->surface->size;
-	mystate->gui->design_pos = ag_vec2i(0,0);
-	ag_gui_elem_manage_layout(mystate->gui);
-	ag_surface_draw_gui_elem(window->surface, mystate->gui);
+	mystate->gui->size = window->surface->size;
+	mystate->gui->pos = ag_vec2i(0,0);
+	ag_gui_manage_layout(mystate->gui);
+	ag_surface_draw_gui(window->surface, mystate->gui);
 	//ag_surface_fill_rect(window->surface, ag_vec2i(20,20), ag_vec2i(1,mystate->font->line_height), (struct ag_color){255,255,255,255});
 }
 

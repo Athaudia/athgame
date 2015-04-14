@@ -15,8 +15,17 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->layouted_size = ag_vec2i(0,0);
 	elem->preferred_size = ag_vec2i(100000,100000);
 	elem->layouted_pos = ag_vec2i(0,0);
+	elem->text = 0;
 	return elem;
 }
+
+void ag_gui_elem_destroy(struct ag_gui_elem* elem)
+{
+	free(elem->text);
+	free(elem->childs);
+	free(elem);
+}
+
 
 struct ag_vec2i ag_gui_elem_type_preffered_size(enum ag_gui_elem_type type)
 {
@@ -29,7 +38,7 @@ struct ag_vec2i ag_gui_elem_type_preffered_size(enum ag_gui_elem_type type)
 	}
 }
 
-struct ag_gui_elem* ag_gui_elem_new_from_file(char* fname)
+struct ag_gui* ag_gui_new_from_file(char* fname)
 {
 	FILE* fil = fopen(fname, "rb");
 	fseek(fil, 0, SEEK_END);
@@ -146,7 +155,12 @@ struct ag_gui_elem* ag_gui_elem_new_from_file(char* fname)
 	free(indent);
 	free(vals);
 
-	return start;
+	struct ag_gui* gui = (struct ag_gui*)malloc(sizeof(struct ag_gui));
+	gui->elem = start->childs[0];
+	gui->size = ag_vec2i(0,0);
+	gui->pos = ag_vec2i(0,0);
+	ag_gui_elem_destroy(start);
+	return gui;
 }
 
 void ag_gui_elem_add_child(struct ag_gui_elem* elem, struct ag_gui_elem* child)
@@ -189,8 +203,6 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 	switch(elem->type)
 	{
 	case AG_GUI_NONE:
-		elem->layouted_size = elem->design_size;
-		elem->layouted_pos = elem->design_pos;
 		elem->childs[0]->layouted_size = elem->layouted_size;
 		elem->childs[0]->layouted_pos = ag_vec2i(0,0);
 		ag_gui_elem_manage_layout(elem->childs[0]);
@@ -292,8 +304,14 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 	}	
 }
 
-void ag_surface_draw_gui_elem(struct ag_surface* surface, struct ag_gui_elem* elem)
+void ag_surface_draw_gui(struct ag_surface* surface, struct ag_gui* gui)
 {
-	if(elem->type == AG_GUI_NONE)
-		ag_surface_draw_gui_elem_p(surface, elem, elem->layouted_pos, elem->layouted_size);
+	ag_surface_draw_gui_elem_p(surface, gui->elem, gui->elem->layouted_pos, gui->elem->layouted_size);
+}
+
+void ag_gui_manage_layout(struct ag_gui* gui)
+{
+	gui->elem->layouted_size = gui->size;
+	gui->elem->layouted_pos = gui->pos;
+	ag_gui_elem_manage_layout(gui->elem);
 }
