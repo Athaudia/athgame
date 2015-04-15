@@ -1,4 +1,12 @@
 hpanel
+	bg
+		hpanel
+			solid
+				color=100,0,0
+			solid
+				color=0,100,0
+			solid
+				color=0,0,100
 	vpanel
 		label
 			text=I am a label

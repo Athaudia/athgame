@@ -68,7 +68,16 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 		printf("beep\n");
 		if(indent[i] == level)
 		{
-			if(strcmp(lines[i], "solid") == 0)
+			if(strcmp(lines[i], "bg") == 0) //special case
+			{
+				new_elem = ag_gui_elem_new();
+				new_elem->type = AG_GUI_NONE;
+				new_elem->parent = elem;
+				elem->bg = new_elem;
+				elem = new_elem;
+				++level;
+			}
+			else if(strcmp(lines[i], "solid") == 0)
 			{
 				new_elem = ag_gui_elem_new();
 				new_elem->type = AG_GUI_SOLID;

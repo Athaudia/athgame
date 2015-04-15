@@ -25,6 +25,7 @@ struct ag_gui_elem
 	enum ag_gui_elem_type type;
 	struct ag_vec2i design_pos, design_size, layouted_size, layouted_pos, preferred_size;
 	struct ag_gui_elem* parent;
+	struct ag_gui_elem* bg;
 	struct ag_gui_elem** childs;
 	enum ag_gui_elem_state state;
 	char* onclick; //name of onclick event

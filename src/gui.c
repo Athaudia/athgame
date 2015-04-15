@@ -10,13 +10,14 @@ struct ag_gui_elem* ag_gui_elem_new()
 	struct ag_gui_elem* elem = (struct ag_gui_elem*)malloc(sizeof(struct ag_gui_elem));
 	elem->childs = 0;
 	elem->child_count = 0;
-	elem->padding = 16;
+	elem->padding = 2;
 	elem->parent = 0;
 	elem->onclick = 0;
 	elem->layouted_size = ag_vec2i(0,0);
 	elem->preferred_size = ag_vec2i(100000,100000);
 	elem->layouted_pos = ag_vec2i(0,0);
 	elem->text = 0;
+	elem->bg = 0;
 	elem->state = AG_GUI_ELEM_STATE_NONE;
 	elem->color = ag_color(0,0,0,255);
 	return elem;
@@ -68,6 +69,13 @@ char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type)
 
 void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 {
+	if(elem->bg)
+	{
+		elem->bg->layouted_pos = ag_vec2i(0,0);
+		elem->bg->layouted_size = elem->layouted_size;
+		ag_gui_elem_manage_layout(elem->bg);
+	}
+
 	switch(elem->type)
 	{
 	case AG_GUI_NONE:
@@ -121,7 +129,9 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 			elem->childs[0]->layouted_pos = ag_vec2i(elem->padding, elem->padding);
 			elem->childs[0]->layouted_size = ag_vec2i(elem->layouted_size.x - elem->padding*2, elem->layouted_size.y - elem->padding*2);
 			if(elem->state == AG_GUI_ELEM_STATE_PRESSED)
+			{
 				elem->childs[0]->layouted_pos = ag_vec2i_add(elem->childs[0]->layouted_pos, ag_vec2i(2,2));
+			}
 			ag_gui_elem_manage_layout(elem->childs[0]);
 		}
 	default:
@@ -143,12 +153,16 @@ struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem)
 
 static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui_elem* elem, struct ag_vec2i pos, struct ag_vec2i size)
 {
+	if(elem->bg)
+		ag_surface_draw_gui_elem_p(surface, elem->bg, pos, size);
+
 	switch(elem->type)
 	{
 	case AG_GUI_NONE:
 		ag_surface_draw_gui_elem_p(surface, elem->childs[0], pos, size);
 		break;
 	case AG_GUI_SOLID:
+		printf("size %i,%i\n", size.x, size.y);
 		ag_surface_fill_rect(surface, pos, size, elem->color);
 		break;
 	case AG_GUI_HPANEL:
@@ -170,7 +184,8 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 			ur1 = ag_vec2i(pos.x+size.x-1, pos.y); ur2 = ag_vec2i(ur1.x-1, ur1.y+1);
 			ll1 = ag_vec2i(pos.x, pos.y+size.y-1); ll2 = ag_vec2i(ll1.x+1, ll1.y-1);
 			lr1 = ag_vec2i(pos.x+size.x-1, pos.y+size.y-1); lr2 = ag_vec2i(lr1.x-1, lr1.y-1);
-			ag_surface_fill_rect(surface, pos, size, col[2]);
+			if(!elem->bg)
+				ag_surface_fill_rect(surface, pos, size, col[2]);
 			ag_surface_draw_line(surface, ul1, ur1, col[4]);
 			ag_surface_draw_line(surface, ul1, ll1, col[4]);
 			ag_surface_draw_line(surface, lr1, ll1, col[0]);
