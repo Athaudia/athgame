@@ -19,7 +19,7 @@ struct ag_platform_window_internal
 
 void ag_platform_init();
 void ag_platform_uninit();
-void ag_platform_window_internal_init(struct ag_platform_window_internal* internal, struct ag_window* window, struct ag_vec2i size);
+void ag_platform_window_internal_init(struct ag_platform_window_internal* internal, struct ag_window* window, struct ag_vec2i size, bool resizeable);
 void ag_platform_window_update(struct ag_window* window);
 void ag_platform_window_resize(struct ag_window* window);
 double ag_get_time();

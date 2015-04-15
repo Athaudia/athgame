@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-static void ag_window_reinit_surfaces(struct ag_window* window)
+void ag_window_reinit_surfaces(struct ag_window* window)
 {
 	if(window->surface)
 		ag_surface_destroy(window->surface);
@@ -15,7 +15,7 @@ static void ag_window_reinit_surfaces(struct ag_window* window)
 		ag_filtered_surface_push(window->filtered_surface, window->filters[i]);
 }
 
-struct ag_window* ag_window_new(struct ag_vec2i size)
+struct ag_window* ag_window_new(struct ag_vec2i size, bool resizeable)
 {
 	struct ag_window* window = (struct ag_window*)malloc(sizeof(struct ag_window));
 	window->mouse_pos.x = 0;
@@ -28,7 +28,7 @@ struct ag_window* ag_window_new(struct ag_vec2i size)
 
 	ag_window_reinit_surfaces(window);
 
-	ag_platform_window_internal_init(&window->internal, window, size);
+	ag_platform_window_internal_init(&window->internal, window, size, resizeable);
 	return window;
 }
 
@@ -48,7 +48,7 @@ void ag_window_update(struct ag_window* window)
 void ag_window_resize(struct ag_window* window, struct ag_vec2i size)
 {
 	window->size = size;
-	ag_window_reinit_surfaces(window);
+	//ag_window_reinit_surfaces(window);
 	ag_platform_window_resize(window);
 }
 

@@ -85,7 +85,7 @@ void mystate_update(void* data, struct ag_window* window)
 int main()
 {
 	ag_init();
-	struct ag_window* window = ag_window_new(ag_vec2i(320, 240));
+	struct ag_window* window = ag_window_new(ag_vec2i(320, 240), true);
 	//ag_window_add_filter(window, AG_FILTER_UP4_NN);
 	struct ag_state* state = ag_state_new(window, 60, mystate_enter, mystate_render, mystate_update, 0);
 

@@ -51,6 +51,10 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			EndPaint(hwnd, &ps);
 			break;
 		}
+	case WM_SIZE:
+		window->size = ag_vec2i(LOWORD(lparam), HIWORD(lparam));
+		ag_window_reinit_surfaces(window);
+		break;
 	case WM_MOUSEMOVE:
 		window->mouse_pos.x = GET_X_LPARAM(lparam) / window->filtered_surface->scale;
 		window->mouse_pos.y = GET_Y_LPARAM(lparam) / window->filtered_surface->scale;
@@ -69,7 +73,7 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 }
 #endif
 
-void ag_platform_window_internal_init(struct ag_platform_window_internal* internal, struct ag_window* window, struct ag_vec2i size)
+void ag_platform_window_internal_init(struct ag_platform_window_internal* internal, struct ag_window* window, struct ag_vec2i size, bool resizeable)
 {
 #ifdef PLATFORM_WIN32
 	WNDCLASSEX wc;
@@ -92,7 +96,10 @@ void ag_platform_window_internal_init(struct ag_platform_window_internal* intern
 
 	RegisterClassEx(&wc);
 
-	style = WS_OVERLAPPEDWINDOW&~WS_THICKFRAME&~WS_MAXIMIZEBOX;
+	if(resizeable)
+		style = WS_OVERLAPPEDWINDOW;
+	else
+		style = WS_OVERLAPPEDWINDOW&~WS_THICKFRAME&~WS_MAXIMIZEBOX;
 	rect.top = 0;
 	rect.left = 0;
 	rect.right = size.w;
