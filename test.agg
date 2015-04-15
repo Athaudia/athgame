@@ -1,11 +1,16 @@
 hpanel
 	vpanel
-		button
-			label
-				text=Yay
-		button
-			label
-				text=Nay :o
-	button
 		label
-			text=aoeui aoeuiBig button!
+			text=I am a label
+		button
+			label
+				text=Large
+			onclick=large
+		button
+			label
+				text=Small
+			onclick=small
+	button
+		onclick=quit
+		label
+			text=Quit

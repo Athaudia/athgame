@@ -54,12 +54,13 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_MOUSEMOVE:
 		window->mouse_pos.x = GET_X_LPARAM(lparam) / window->filtered_surface->scale;
 		window->mouse_pos.y = GET_Y_LPARAM(lparam) / window->filtered_surface->scale;
+		ag_event_push(ag_event_mouse_move_new(window, window->mouse_pos));
 		break;
 	case WM_LBUTTONDOWN:
-		ag_event_push(ag_event_mouse_down_new(window));
+		ag_event_push(ag_event_mouse_down_new(window, window->mouse_pos));
 		break;
 	case WM_LBUTTONUP:
-		ag_event_push(ag_event_mouse_up_new(window));
+		ag_event_push(ag_event_mouse_up_new(window, window->mouse_pos));
 		break;
 	default:
         return DefWindowProc(hwnd, msg, wparam, lparam);

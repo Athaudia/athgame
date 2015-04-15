@@ -53,13 +53,28 @@ void mystate_update(void* data, struct ag_window* window)
 	struct ag_event* event;
 	while((event = ag_event_get()))
 	{
-		if(event->type == AG_EVENT_CLOSE)
+		switch(event->type)
+		{
+		case AG_EVENT_CLOSE:
 			ag_state_pop();
+			break;
+		case AG_EVENT_GUI_CLICKED:
+			printf("event: %s\n", event->id);
+			if(strcmp("large", event->id) == 0)
+				ag_window_resize(window, ag_vec2i(320*3,240*3));
+			else if(strcmp("small", event->id) == 0)
+				ag_window_resize(window, ag_vec2i(320,240));
+			else if(strcmp("quit", event->id) == 0)
+				ag_state_pop();
+			break;
+		default:
+			ag_gui_process_event(mystate->gui, event);
+		}
 	}
 
 	mystate->tick++;
 	//if(mystate->tick)
-		ag_window_resize(window, ag_vec2i_add(window->size, ag_vec2i(1,1)));
+	//	ag_window_resize(window, ag_vec2i_add(window->size, ag_vec2i(1,1)));
 }
 
 

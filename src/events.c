@@ -9,23 +9,49 @@ static struct ag_event* last_event = 0;
 struct ag_event* ag_event_close_new(struct ag_window* window)
 {
 	struct ag_event* event = (struct ag_event*)malloc(sizeof(struct ag_event));
+	event->window = window;
 	event->type = AG_EVENT_CLOSE;
 	return event;
 }
 
-struct ag_event* ag_event_mouse_down_new(struct ag_window* window)
+struct ag_event* ag_event_mouse_down_new(struct ag_window* window, struct ag_vec2i pos)
 {
 	struct ag_event* event = (struct ag_event*)malloc(sizeof(struct ag_event));
+	event->window = window;
 	event->type = AG_EVENT_MOUSE_DOWN;
+	event->mouse_pos = pos;
 	return event;
 }
 
-struct ag_event* ag_event_mouse_up_new(struct ag_window* window)
+struct ag_event* ag_event_mouse_up_new(struct ag_window* window, struct ag_vec2i pos)
 {
 	struct ag_event* event = (struct ag_event*)malloc(sizeof(struct ag_event));
+	event->window = window;
 	event->type = AG_EVENT_MOUSE_UP;
+	event->mouse_pos = pos;
 	return event;
 }
+
+struct ag_event* ag_event_mouse_move_new(struct ag_window* window, struct ag_vec2i pos)
+{
+	struct ag_event* event = (struct ag_event*)malloc(sizeof(struct ag_event));
+	event->window = window;
+	event->type = AG_EVENT_MOUSE_MOVE;
+	event->mouse_pos = pos;
+	return event;
+}
+
+struct ag_event* ag_event_gui_clicked_new(struct ag_gui* gui, struct ag_gui_elem* elem, char* id)
+{
+	struct ag_event* event = (struct ag_event*)malloc(sizeof(struct ag_event));
+	event->window = 0;
+	event->type = AG_EVENT_GUI_CLICKED;
+	event->gui = gui;
+	event->gui_elem = elem;
+	event->id = id;
+	return event;
+}
+
 
 void ag_event_destroy(struct ag_event* event)
 {

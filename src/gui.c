@@ -12,10 +12,12 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->child_count = 0;
 	elem->padding = 16;
 	elem->parent = 0;
+	elem->onclick = 0;
 	elem->layouted_size = ag_vec2i(0,0);
 	elem->preferred_size = ag_vec2i(100000,100000);
 	elem->layouted_pos = ag_vec2i(0,0);
 	elem->text = 0;
+	elem->state = AG_GUI_ELEM_STATE_NONE;
 	return elem;
 }
 
@@ -131,6 +133,11 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			{
 				elem->text = vals[i];
 			}
+			else if(strcmp(lines[i], "onclick") == 0)
+			{
+				printf("onclick added\n");
+				elem->onclick = vals[i];
+			}
 			else
 			{
 				fprintf(stderr, "unknown identifier \"%s\"\n", lines[i]);
@@ -149,8 +156,9 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 		}
 	}
 
+	//todo: move data into gui struct and keep until destruction
+	//free(data);
 
-	free(data);
 	free(lines);
 	free(indent);
 	free(vals);
@@ -159,6 +167,7 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 	gui->elem = start->childs[0];
 	gui->size = ag_vec2i(0,0);
 	gui->pos = ag_vec2i(0,0);
+	gui->focused_elem = 0;
 	ag_gui_elem_destroy(start);
 	return gui;
 }
@@ -221,7 +230,6 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 				if(elem->childs[i]->preferred_size.h < elem->childs[i]->layouted_size.h)
 					dif.h = elem->childs[i]->layouted_size.h - elem->childs[i]->preferred_size.h;
 				elem->childs[i]->layouted_size = ag_vec2i_sub(elem->childs[i]->layouted_size, dif);
-				printf("layouted_size %i %i\n", elem->childs[i]->layouted_size.x, elem->childs[i]->layouted_size.y);
 
 				elem->childs[i]->layouted_pos = ag_vec2i(i*(size+elem->padding)+dif.x/2, dif.y/2);
 				ag_gui_elem_manage_layout(elem->childs[i]);
@@ -253,12 +261,26 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 		{
 			elem->childs[0]->layouted_pos = ag_vec2i(elem->padding, elem->padding);
 			elem->childs[0]->layouted_size = ag_vec2i(elem->layouted_size.x - elem->padding*2, elem->layouted_size.y - elem->padding*2);
+			if(elem->state == AG_GUI_ELEM_STATE_PRESSED)
+				elem->childs[0]->layouted_pos = ag_vec2i_add(elem->childs[0]->layouted_pos, ag_vec2i(2,2));
 			ag_gui_elem_manage_layout(elem->childs[0]);
 		}
 	default:
 		break;
 	}
 }
+
+struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem)
+{
+	struct ag_vec2i pos = ag_vec2i(0,0);
+	while(elem)
+	{
+		pos = ag_vec2i_add(pos, elem->layouted_pos);
+		elem = elem->parent;
+	}
+	return pos;
+}
+
 
 static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui_elem* elem, struct ag_vec2i pos, struct ag_vec2i size)
 {
@@ -277,6 +299,10 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 			struct ag_color col[5];
 			for(int i = 0; i < 5; ++i)
 				col[i] = ag_color(255*i/4, 255*i/16, 255*i/8, 255);
+			if(elem->state == AG_GUI_ELEM_STATE_PRESSED)
+				for(int i = 0; i < 5; ++i)
+					col[4-i] = ag_color(255*i/4, 255*i/16, 255*i/8, 255);
+
 			struct ag_vec2i ul1, ul2, ur1, ur2, ll1, ll2, lr1, lr2;
 			ul1 = pos; ul2 = ag_vec2i(ul1.x+1, ul1.y+1);
 			ur1 = ag_vec2i(pos.x+size.x-1, pos.y); ur2 = ag_vec2i(ur1.x-1, ur1.y+1);
@@ -314,4 +340,75 @@ void ag_gui_manage_layout(struct ag_gui* gui)
 	gui->elem->layouted_size = gui->size;
 	gui->elem->layouted_pos = gui->pos;
 	ag_gui_elem_manage_layout(gui->elem);
+}
+
+struct ag_gui_elem* ag_gui_get_elem_from_coord(struct ag_gui* gui, struct ag_vec2i coord)
+{
+	if(!ag_vec2i_point_in_rect(coord, gui->pos, gui->size))
+		return 0;
+	coord = ag_vec2i_sub(coord, gui->pos);
+	struct ag_gui_elem* elem = gui->elem;
+	
+	while(true)
+	{
+		outer:
+		switch(elem->type)
+		{
+		case AG_GUI_BUTTON:
+		case AG_GUI_LABEL:
+			return elem;
+		default:
+			for(int i = 0; i < elem->child_count; ++i)
+			{
+				if(ag_vec2i_point_in_rect(coord, elem->childs[i]->layouted_pos, elem->childs[i]->layouted_size))
+				{
+					coord = ag_vec2i_sub(coord, elem->childs[i]->layouted_pos);
+					elem = elem->childs[i];
+					goto outer;
+				}
+			}
+			return elem;
+		}
+	}
+	return 0; //unreachable
+}
+
+void ag_gui_process_event(struct ag_gui* gui, struct ag_event* event)
+{
+	switch(event->type)
+	{
+	case AG_EVENT_MOUSE_DOWN:
+		{
+			struct ag_gui_elem* elem = ag_gui_get_elem_from_coord(gui, event->mouse_pos);
+			elem->state = AG_GUI_ELEM_STATE_PRESSED;
+			gui->focused_elem = elem;
+		}
+		break;
+	case AG_EVENT_MOUSE_MOVE:
+		{
+			if(gui->focused_elem)
+			{
+				if(ag_vec2i_point_in_rect(event->mouse_pos, ag_vec2i_add(gui->pos, ag_gui_elem_get_absolute_pos(gui->focused_elem)), gui->focused_elem->layouted_size))
+					gui->focused_elem->state = AG_GUI_ELEM_STATE_PRESSED;
+				else
+					gui->focused_elem->state = AG_GUI_ELEM_STATE_NONE;
+			}
+		}
+		break;
+	case AG_EVENT_MOUSE_UP:
+		{
+			if(gui->focused_elem)
+			{
+				if(gui->focused_elem->state == AG_GUI_ELEM_STATE_PRESSED)
+				{
+					gui->focused_elem->state = AG_GUI_ELEM_STATE_NONE;
+					if(gui->focused_elem->onclick)
+						ag_event_push(ag_event_gui_clicked_new(gui, gui->focused_elem, gui->focused_elem->onclick));
+				}
+				gui->focused_elem = 0;
+			}
+		}
+	default:
+		break;
+	}
 }
