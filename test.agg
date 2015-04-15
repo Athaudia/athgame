@@ -3,8 +3,8 @@ hpanel
 		hpanel
 			solid
 				color=100,0,0
-			solid
-				color=0,100,0
+			image
+				file=mario.bmp
 			solid
 				color=0,0,100
 	vpanel

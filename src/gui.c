@@ -172,7 +172,7 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 		if(!elem->surface && elem->filename)
 			elem->surface = ag_surface_new_from_file(elem->filename); //todo: load from cache
 		if(elem->surface)
-			ag_surface_blit_to(surface, elem->surface, pos);
+			ag_surface_blit_clipped_to(surface, elem->surface, ag_vec2i_sub(ag_vec2i_add(pos, ag_vec2i_div(size,2)),ag_vec2i_div(elem->surface->size,2)) , pos, size);
 	case AG_GUI_HPANEL:
 	case AG_GUI_VPANEL:
 		for(int i = 0; i < elem->child_count; ++i)
