@@ -165,7 +165,6 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 		ag_surface_draw_gui_elem_p(surface, elem->childs[0], pos, size);
 		break;
 	case AG_GUI_SOLID:
-		printf("size %i,%i\n", size.x, size.y);
 		ag_surface_fill_rect(surface, pos, size, elem->color);
 		break;
 	case AG_GUI_IMG:

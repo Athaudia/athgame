@@ -126,7 +126,6 @@ void ag_surface_blit_to(struct ag_surface* dst, struct ag_surface* src, struct a
 
 void ag_surface_blit_partial_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
 {
-	printf("ag_surface_blit_partial_to(dst, src, [%i,%i], [%i,%i], [%i,%i]\n", dst_pos.x, dst_pos.y, src_pos.x, src_pos.y, src_size.x, src_size.y);
 	if(src_size.x > src->size.x - src_pos.x)
 		src_size.x = src->size.x - src_pos.x;
 	if(src_size.y > src->size.y - src_pos.y)

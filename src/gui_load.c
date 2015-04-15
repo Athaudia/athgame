@@ -55,8 +55,8 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			vals[i] = "";
 	}
 	
-	for(int i = 0; i < line_count; ++i)
-		printf("line (%i): (%s) (%s)\n", indent[i], lines[i], vals[i]);
+	//for(int i = 0; i < line_count; ++i)
+	//	printf("line (%i): (%s) (%s)\n", indent[i], lines[i], vals[i]);
 
 	struct ag_gui_elem* start = ag_gui_elem_new();
 	start->type = AG_GUI_NONE;
@@ -65,7 +65,6 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 	int level = 0;
 	for(int i = 0; i < line_count; ++i)
 	{
-		printf("beep\n");
 		if(indent[i] == level)
 		{
 			if(strcmp(lines[i], "bg") == 0) //special case
@@ -136,7 +135,6 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			}
 			else if(strcmp(lines[i], "onclick") == 0)
 			{
-				printf("onclick added\n");
 				elem->onclick = vals[i];
 			}
 			else if(strcmp(lines[i], "color") == 0)
