@@ -2,7 +2,7 @@
 #include "events.h"
 #include <stdio.h>
 
-static struct ag_state* current_state;
+struct ag_state* ag_state_current;
 
 struct ag_state* ag_state_new(struct ag_window* window, double target_fps,
                               void* (*enter)(),
@@ -22,47 +22,52 @@ struct ag_state* ag_state_new(struct ag_window* window, double target_fps,
 
 void ag_state_run(struct ag_state* state)
 {
-	current_state = state;
-	current_state->data = current_state->enter();
-	double last_tick = ag_get_time()-1.0/current_state->target_fps;
-	double last_sec = ag_get_time();
-	int frames_since_last_sec = -1;
-	while(current_state)
+	ag_state_current = state;
+	ag_state_current->data = ag_state_current->enter();
+	state->last_tick = ag_get_time()-1.0/ag_state_current->target_fps;
+	state->last_sec = ag_get_time();
+	state->frames_since_last_sec = -1;
+	while(ag_state_current)
 	{
-		double now = ag_get_time();
-		if(now-last_tick >= 10.0/current_state->target_fps) //skip detected of atleast 10 frames
-		{
-			printf("skip detected\n");
-			last_tick = ag_get_time()-1.0/current_state->target_fps;
-		}
+		ag_state_run_inner(ag_state_current);
+	}
+}
 
-		if(now-last_tick >= 1.0/current_state->target_fps)
-		{
-			current_state->update(current_state->data, current_state->window);
-			if(!current_state)
-				break;
-			current_state->render(current_state->data, current_state->window);
-			ag_window_update(current_state->window);
-			last_tick += 1.0/current_state->target_fps;
-			++frames_since_last_sec;
-		}
-		else
-			ag_sleep(1);
-		
-		if(now-last_sec >= 1.0)
-		{
-			printf("fps: %i/%.0f\n", frames_since_last_sec, current_state->target_fps);
-			frames_since_last_sec = 0;
-			last_sec += 1.0;
-		}
+void ag_state_run_inner(struct ag_state* state)
+{
+	double now = ag_get_time();
+	if(now-state->last_tick >= 10.0/ag_state_current->target_fps) //skip detected of atleast 10 frames
+	{
+		printf("skip detected\n");
+		state->last_tick = ag_get_time()-1.0/ag_state_current->target_fps;
+	}
+
+	if(now-state->last_tick >= 1.0/ag_state_current->target_fps)
+	{
+		ag_state_current->update(ag_state_current->data, ag_state_current->window);
+		if(!ag_state_current)
+			return;
+		ag_state_current->render(ag_state_current->data, ag_state_current->window);
+		ag_window_update(ag_state_current->window);
+		state->last_tick += 1.0/ag_state_current->target_fps;
+		++state->frames_since_last_sec;
+	}
+	else
+		ag_sleep(1);
+	
+	if(now-state->last_sec >= 1.0)
+	{
+		printf("fps: %i/%.0f\n", state->frames_since_last_sec, ag_state_current->target_fps);
+		state->frames_since_last_sec = 0;
+		state->last_sec += 1.0;
 	}
 }
 
 void ag_state_pop()
 {
 	//todo: actually pop instead of kill
-	current_state->exit(current_state->data);
-	current_state = 0;
+	ag_state_current->exit(ag_state_current->data);
+	ag_state_current = 0;
 }
 
 void* ag_state_default_enter()

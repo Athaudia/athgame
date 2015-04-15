@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "window.h"
 #include "events.h"
+#include "state.h"
 #include <stdio.h>
 
 void ag_platform_init()
@@ -54,6 +55,8 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_SIZE:
 		window->size = ag_vec2i(LOWORD(lparam), HIWORD(lparam));
 		ag_window_reinit_surfaces(window);
+		if(ag_state_current)
+			ag_state_run_inner(ag_state_current);
 		break;
 	case WM_MOUSEMOVE:
 		window->mouse_pos.x = GET_X_LPARAM(lparam) / window->filtered_surface->scale;

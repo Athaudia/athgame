@@ -4,10 +4,12 @@
 #include "font.h"
 #include "gui.h"
 #include "quicksand_regular.h"
+#include "state.h"
 
 
 void ag_init()
 {
+	ag_state_current = 0;
 	agc_white = (struct ag_color){255,255,255,255};
 	agc_black = (struct ag_color){0,0,0,255};
 	ag_event_queue = 0;

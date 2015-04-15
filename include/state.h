@@ -16,6 +16,9 @@ struct ag_state
 	void (*render)(void* data, struct ag_window* window);
 	void (*update)(void* data, struct ag_window* window);
 	void (*exit)(void* data);
+
+	double last_tick, last_sec;
+	int frames_since_last_sec;
 };
 
 struct ag_state* ag_state_new(struct ag_window* window, double target_fps,
@@ -25,7 +28,10 @@ struct ag_state* ag_state_new(struct ag_window* window, double target_fps,
                               void (*exit)(void* data));
 
 void ag_state_run(struct ag_state* state);
+void ag_state_run_inner(struct ag_state* state);
 
 void ag_state_pop();
+
+extern struct ag_state* ag_state_current;
 
 #endif
