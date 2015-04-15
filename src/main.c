@@ -42,7 +42,11 @@ void mystate_render(void* data, struct ag_window* window)
 	mystate->gui->size = window->surface->size;
 	mystate->gui->pos = ag_vec2i(0,0);
 	ag_gui_manage_layout(mystate->gui);
-	ag_surface_draw_gui(window->surface, mystate->gui);
+	//ag_surface_draw_gui(window->surface, mystate->gui);
+	//ag_surface_blit_to(window->surface, mystate->bg, ag_vec2i(0,0));
+	//ag_surface_blit_partial_to(window->surface, mystate->bg, ag_vec2i(0,0), ag_vec2i(16,16), ag_vec2i(320,240));
+	ag_surface_blit_partial_to(window->surface, mystate->bg, ag_vec2i(270,0), ag_vec2i(16,16), ag_vec2i(48,16));
+	ag_surface_blit_clipped_to(window->surface, mystate->bg, window->mouse_pos, ag_vec2i(160,160), ag_vec2i(48,16));
 	//ag_surface_fill_rect(window->surface, ag_vec2i(20,20), ag_vec2i(1,mystate->font->line_height), (struct ag_color){255,255,255,255});
 }
 

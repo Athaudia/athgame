@@ -119,10 +119,51 @@ void ag_surface_clear(struct ag_surface* surface, struct ag_color color)
 
 void ag_surface_blit_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos)
 {
-	for(int y = 0; y < src->size.h; ++y)
-		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+y*src->size.w, src->size.w*4);
+	ag_surface_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
+//	for(int y = 0; y < src->size.h; ++y)
+//		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+y*src->size.w, src->size.w*4);
 }
 
+void ag_surface_blit_partial_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
+{
+	printf("ag_surface_blit_partial_to(dst, src, [%i,%i], [%i,%i], [%i,%i]\n", dst_pos.x, dst_pos.y, src_pos.x, src_pos.y, src_size.x, src_size.y);
+	if(src_size.x > src->size.x - src_pos.x)
+		src_size.x = src->size.x - src_pos.x;
+	if(src_size.y > src->size.y - src_pos.y)
+		src_size.y = src->size.y - src_pos.y;
+	for(int y = 0; y < src_size.h; ++y)
+		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+src_pos.x+(y+src_pos.y)*src->size.w, src_size.w*4);
+}
+
+void ag_surface_blit_clipped_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
+{
+	struct ag_vec2i src_pos = ag_vec2i(0,0);
+	struct ag_vec2i src_size = src->size;
+	if(clip_pos.x > pos.x)
+	{
+		src_pos.x = clip_pos.x - pos.x;
+		pos.x = clip_pos.x;
+	}
+	else
+		clip_size.x -= pos.x-clip_pos.x;
+	if(clip_pos.y > pos.y)
+	{
+		src_pos.y = clip_pos.y - pos.y;
+		pos.y = clip_pos.y;
+	}
+	else
+		clip_size.y -= pos.y-clip_pos.y;
+
+	 //image size
+
+	 //clip size from img pos
+	if(src_size.x > clip_size.x)
+		src_size.x = clip_size.x;
+	if(src_size.y > clip_size.y)
+		src_size.y = clip_size.y;
+	if(src_size.x > 0 && src_size.y > 0)
+		ag_surface_blit_partial_to(dst, src, pos, src_pos, src_size);
+}
 
 void ag_surface_blit_with_alphachan_as_color_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_color color)
 {

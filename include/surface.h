@@ -48,6 +48,8 @@ void ag_surface_destroy(struct ag_surface* surface);
 
 void ag_surface_clear(struct ag_surface* surface, struct ag_color color);
 void ag_surface_blit_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos);
+void ag_surface_blit_partial_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size);
+void ag_surface_blit_clipped_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size);
 void ag_surface_blit_with_alphachan_as_color_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_color color);
 
 
