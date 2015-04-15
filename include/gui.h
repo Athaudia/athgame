@@ -8,7 +8,7 @@
 
 enum ag_gui_elem_type
 {
-AG_GUI_NONE, AG_GUI_SOLID,
+AG_GUI_NONE, AG_GUI_SOLID, AG_GUI_IMG,
 AG_GUI_BUTTON, AG_GUI_LABEL,
 AG_GUI_HPANEL, AG_GUI_VPANEL
 };
@@ -33,6 +33,8 @@ struct ag_gui_elem
 	struct ag_color color;
 	int child_count;
 	char* text;
+	char* filename;
+	struct ag_surface* surface;
 	int padding;
 };
 

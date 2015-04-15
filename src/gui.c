@@ -17,6 +17,8 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->preferred_size = ag_vec2i(100000,100000);
 	elem->layouted_pos = ag_vec2i(0,0);
 	elem->text = 0;
+	elem->filename = 0;
+	elem->surface = 0;
 	elem->bg = 0;
 	elem->state = AG_GUI_ELEM_STATE_NONE;
 	elem->color = ag_color(0,0,0,255);
@@ -59,6 +61,7 @@ char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type)
 	{
 		case AG_GUI_NONE: return "none";
 		case AG_GUI_SOLID: return "solid";
+		case AG_GUI_IMG: return "image";
 		case AG_GUI_BUTTON: return "button";
 		case AG_GUI_LABEL: return "label";
 		case AG_GUI_HPANEL: return "hpanel";
@@ -165,6 +168,11 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 		printf("size %i,%i\n", size.x, size.y);
 		ag_surface_fill_rect(surface, pos, size, elem->color);
 		break;
+	case AG_GUI_IMG:
+		if(!elem->surface && elem->filename)
+			elem->surface = ag_surface_new_from_file(elem->filename); //todo: load from cache
+		if(elem->surface)
+			ag_surface_blit_to(surface, elem->surface, pos);
 	case AG_GUI_HPANEL:
 	case AG_GUI_VPANEL:
 		for(int i = 0; i < elem->child_count; ++i)

@@ -20,5 +20,5 @@ hpanel
 			onclick=small
 	button
 		onclick=quit
-		label
-			text=Quit
+		image
+			file=icon.bmp

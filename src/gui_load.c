@@ -85,6 +85,14 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 				elem = new_elem;
 				++level;
 			}
+			else if(strcmp(lines[i], "image") == 0)
+			{
+				new_elem = ag_gui_elem_new();
+				new_elem->type = AG_GUI_IMG;
+				ag_gui_elem_add_child(elem, new_elem);
+				elem = new_elem;
+				++level;
+			}
 			else if(strcmp(lines[i], "button") == 0)
 			{
 				new_elem = ag_gui_elem_new();
@@ -121,6 +129,10 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			else if(strcmp(lines[i], "text") == 0)
 			{
 				elem->text = vals[i];
+			}
+			else if(strcmp(lines[i], "file") == 0)
+			{
+				elem->filename = vals[i];
 			}
 			else if(strcmp(lines[i], "onclick") == 0)
 			{
