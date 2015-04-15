@@ -68,7 +68,15 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 		printf("beep\n");
 		if(indent[i] == level)
 		{
-			if(strcmp(lines[i], "button") == 0)
+			if(strcmp(lines[i], "solid") == 0)
+			{
+				new_elem = ag_gui_elem_new();
+				new_elem->type = AG_GUI_SOLID;
+				ag_gui_elem_add_child(elem, new_elem);
+				elem = new_elem;
+				++level;
+			}
+			else if(strcmp(lines[i], "button") == 0)
 			{
 				new_elem = ag_gui_elem_new();
 				new_elem->type = AG_GUI_BUTTON;
@@ -109,6 +117,15 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			{
 				printf("onclick added\n");
 				elem->onclick = vals[i];
+			}
+			else if(strcmp(lines[i], "color") == 0)
+			{
+				//todo: actually read colour
+				char* end;
+				int r = strtol(vals[i], &end, 10);
+				int g = strtol(end+1, &end, 10);
+				int b = strtol(end+1, &end, 10);
+				elem->color = ag_color(r, g, b, 255);
 			}
 			else
 			{

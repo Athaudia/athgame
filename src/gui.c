@@ -18,6 +18,7 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->layouted_pos = ag_vec2i(0,0);
 	elem->text = 0;
 	elem->state = AG_GUI_ELEM_STATE_NONE;
+	elem->color = ag_color(0,0,0,255);
 	return elem;
 }
 
@@ -56,6 +57,7 @@ char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type)
 	switch(type)
 	{
 		case AG_GUI_NONE: return "none";
+		case AG_GUI_SOLID: return "solid";
 		case AG_GUI_BUTTON: return "button";
 		case AG_GUI_LABEL: return "label";
 		case AG_GUI_HPANEL: return "hpanel";
@@ -145,6 +147,9 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 	{
 	case AG_GUI_NONE:
 		ag_surface_draw_gui_elem_p(surface, elem->childs[0], pos, size);
+		break;
+	case AG_GUI_SOLID:
+		ag_surface_fill_rect(surface, pos, size, elem->color);
 		break;
 	case AG_GUI_HPANEL:
 	case AG_GUI_VPANEL:

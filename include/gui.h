@@ -8,7 +8,7 @@
 
 enum ag_gui_elem_type
 {
-AG_GUI_NONE,
+AG_GUI_NONE, AG_GUI_SOLID,
 AG_GUI_BUTTON, AG_GUI_LABEL,
 AG_GUI_HPANEL, AG_GUI_VPANEL
 };
@@ -28,6 +28,8 @@ struct ag_gui_elem
 	struct ag_gui_elem** childs;
 	enum ag_gui_elem_state state;
 	char* onclick; //name of onclick event
+	bool design_size_relative;
+	struct ag_color color;
 	int child_count;
 	char* text;
 	int padding;
