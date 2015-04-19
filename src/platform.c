@@ -46,7 +46,7 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			info.bmiHeader.biYPelsPerMeter = 1;
 			info.bmiHeader.biClrUsed = 0;
 			info.bmiHeader.biClrImportant = 0;
-
+			printf("painting %i, %i\n", surface->size.w, surface->size.h);
 			HDC hdc = BeginPaint(hwnd, &ps);
 			SetDIBitsToDevice(hdc, 0, 0, surface->size.w, surface->size.h, 0, 0, 0, surface->size.h, surface->data, &info, DIB_RGB_COLORS);
 			EndPaint(hwnd, &ps);

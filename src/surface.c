@@ -207,7 +207,8 @@ void ag_filtered_surface_push(struct ag_filtered_surface* surface, enum ag_filte
 	surface->filters[surface->filter_count-1] = filter;
 	double new_mult = ag_filter_get_scale(filter);
 	struct ag_surface* old = surface->filter_surfaces[surface->filter_count-1];
-	surface->filter_surfaces[surface->filter_count] = ag_surface_new(ag_vec2i_mult(old->size, new_mult));
+	//surface->filter_surfaces[surface->filter_count] = ag_surface_new(ag_vec2i_mult(old->size, new_mult));
+	surface->filter_surfaces[surface->filter_count] = ag_surface_new(ag_vec2i(old->size.x*new_mult, old->size.y*new_mult));
 	surface->scale *= new_mult;
 	surface->output = surface->filter_surfaces[surface->filter_count];
 }

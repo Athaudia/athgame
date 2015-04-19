@@ -209,7 +209,6 @@ struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem)
 
 struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem)
 {
-	printf("getting pref size for %s %i\n", ag_gui_elem_type_to_string(elem->type),(int) elem->surface);
 	switch(elem->type)
 	{
 		case AG_GUI_NONE:

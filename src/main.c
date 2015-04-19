@@ -65,9 +65,10 @@ void mystate_update(void* data, struct ag_window* window)
 		case AG_EVENT_GUI_CLICKED:
 			printf("event: %s\n", event->id);
 			if(strcmp("large", event->id) == 0)
-				ag_window_resize(window, ag_vec2i(320*3,240*3));
+				//ag_window_resize(window, ag_vec2i(320*3,240*3));
+				ag_window_add_filter(window, AG_FILTER_UP2_SCALE2X);
 			else if(strcmp("small", event->id) == 0)
-				ag_window_resize(window, ag_vec2i(320,240));
+				ag_window_add_filter(window, AG_FILTER_DOWN2_AVG);
 			else if(strcmp("quit", event->id) == 0)
 				ag_state_pop();
 			break;
@@ -86,7 +87,7 @@ int main()
 {
 	ag_init();
 	struct ag_window* window = ag_window_new(ag_vec2i(320, 240), true);
-	ag_window_add_filter(window, AG_FILTER_UP2_SCALE2X);
+	//ag_window_add_filter(window, AG_FILTER_UP2_SCALE2X);
 	struct ag_state* state = ag_state_new(window, 60, mystate_enter, mystate_render, mystate_update, 0);
 
 
