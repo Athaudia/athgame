@@ -4,6 +4,7 @@
 
 void ag_window_reinit_surfaces(struct ag_window* window)
 {
+	printf("ws: %i", window->size.w);
 	if(window->surface)
 		ag_surface_destroy(window->surface);
 	if(window->filtered_surface)

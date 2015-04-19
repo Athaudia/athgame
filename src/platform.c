@@ -53,7 +53,7 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			break;
 		}
 	case WM_SIZE:
-		window->size = ag_vec2i(LOWORD(lparam), HIWORD(lparam));
+		window->size = ag_vec2i(LOWORD(lparam)/window->filtered_surface->scale, HIWORD(lparam)/window->filtered_surface->scale);
 		ag_window_reinit_surfaces(window);
 		if(ag_state_current)
 			ag_state_run_inner(ag_state_current);

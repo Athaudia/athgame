@@ -273,6 +273,7 @@ struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem)
 
 static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui_elem* elem, struct ag_vec2i pos, struct ag_vec2i size)
 {
+	//printf("sss: %i\n", surface->size.w);
 	if(elem->bg)
 		ag_surface_draw_gui_elem_p(surface, elem->bg, pos, size);
 

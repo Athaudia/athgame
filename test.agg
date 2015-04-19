@@ -1,19 +1,6 @@
 hpanel
-	bg
-		hpanel
-			solid
-				color=100,0,0
-				size=*1,*1
-			image
-				file=mario.bmp
-				size=auto
-			solid
-				size=*2,*1
-				color=0,0,100
 	vpanel
-		size=auto
 		label
-			size=auto
 			text=I am a label
 			bg
 				solid
@@ -26,6 +13,12 @@ hpanel
 			label
 				text=Small
 			onclick=small
+	image
+		bg
+			solid
+				color=0,0,0
+		file=mario.bmp
+		size=*1,*1
 	vpanel
 		button
 			onclick=quit
