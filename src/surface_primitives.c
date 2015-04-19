@@ -70,6 +70,9 @@ void ag_surface_draw_line(struct ag_surface* surface, struct ag_vec2i start, str
 
 
 //todo: clean up mess
+#ifdef __NO_INLINE__
+#define inline
+#endif 
 
 inline void _dla_changebrightness(struct ag_color* from, struct ag_color* to, float br)
 {
@@ -79,16 +82,17 @@ inline void _dla_changebrightness(struct ag_color* from, struct ag_color* to, fl
 	to->g = br * (float)from->g + (1.0-br) * (float)to->g;
 	to->b = br * (float)from->b + (1.0-br) * (float)to->b;
 }
- 
-#define plot_(X,Y,D) do{ struct ag_color f_ = color;				\
-  _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
- 
+
 inline void _dla_plot(struct ag_surface* img, int x, int y, struct ag_color* col, float br)
 {
   struct ag_color oc = img->data[x+y*img->size.w];
   _dla_changebrightness(col, &oc, br);
   img->data[x+y*img->size.w] = oc;
 }
+ 
+#define plot_(X,Y,D) do{ struct ag_color f_ = color;				\
+  _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
+ 
  
 #define ipart_(X) ((int)(X))
 #define round_(X) ((int)(((double)(X))+0.5))

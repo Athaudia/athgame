@@ -1,17 +1,6 @@
 #include "gui.h"
 
 
-struct ag_vec2i ag_gui_elem_type_preffered_size(enum ag_gui_elem_type type)
-{
-	switch(type)
-	{
-	case AG_GUI_BUTTON:
-		return ag_vec2i(120,30);
-	default:
-		return ag_vec2i(100000,100000);
-	}
-}
-
 struct ag_gui* ag_gui_new_from_file(char* fname)
 {
 	FILE* fil = fopen(fname, "rb");
@@ -97,7 +86,7 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 				new_elem = ag_gui_elem_new();
 				new_elem->type = AG_GUI_BUTTON;
 				ag_gui_elem_add_child(elem, new_elem);
-				new_elem->preferred_size = ag_gui_elem_type_preffered_size(AG_GUI_BUTTON);
+				new_elem->preferred_size = ag_gui_elem_get_preferred_size(new_elem);
 				elem = new_elem;
 				++level;
 			}
@@ -124,6 +113,38 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 				ag_gui_elem_add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
+			}
+			else if(strcmp(lines[i], "size") == 0)
+			{
+				if(strcmp(vals[i], "auto") == 0 )
+				{
+					elem->design_size = ag_vec2i(0,0);
+				}
+				else
+				{
+					if(vals[i][0] == '*')
+					{
+						elem->design_width_relative = true;
+						++vals[i];
+					}
+					else
+						elem->design_width_relative = false;
+					char* end;
+					elem->design_size.w = strtol(vals[i], &end, 10);
+					++end;
+
+					
+					if(end[0] == '*')
+					{
+						elem->design_height_relative = true;
+						++end;
+					}
+					else
+						elem->design_height_relative = false;
+					elem->design_size.h = strtol(end, &end, 10);
+					++end;
+				}
+				
 			}
 			else if(strcmp(lines[i], "text") == 0)
 			{

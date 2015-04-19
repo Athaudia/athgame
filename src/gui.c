@@ -16,6 +16,10 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->layouted_size = ag_vec2i(0,0);
 	elem->preferred_size = ag_vec2i(100000,100000);
 	elem->layouted_pos = ag_vec2i(0,0);
+	elem->design_size = ag_vec2i(1,1);
+	elem->design_size = ag_vec2i(0,0);//auto
+	elem->design_width_relative = true;
+	elem->design_height_relative = true;
 	elem->text = 0;
 	elem->filename = 0;
 	elem->surface = 0;
@@ -88,40 +92,90 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem)
 		break;
 	case AG_GUI_HPANEL:
 		{
-			int size = (elem->layouted_size.x+elem->padding)/elem->child_count - elem->padding;
-			int rest = elem->layouted_size.x - ((size+elem->padding)*elem->child_count-elem->padding);
+			int relcount = 0;
+			int abs_elems_width = 0;
+			for(int i = 0; i < elem->child_count; ++i)
+				if(elem->childs[i]->design_size.x == 0)
+					abs_elems_width += ag_gui_elem_get_preferred_size(elem->childs[i]).x;
+				else if(elem->childs[i]->design_width_relative)
+					relcount += elem->childs[i]->design_size.w;
+				else
+					abs_elems_width += elem->childs[i]->design_size.w;
+
+			if(relcount == 0)
+				relcount = 1; // division by zero
+			int total_size_without_padding = elem->layouted_size.x - (elem->child_count+1) * elem->padding;
+			int size = (total_size_without_padding-abs_elems_width) / relcount;
+			int rest = (total_size_without_padding-abs_elems_width) - size*relcount;
+			int pos = elem->padding;
 			for(int i = 0; i < elem->child_count; ++i)
 			{
-				elem->childs[i]->layouted_size = ag_vec2i(size+((i==elem->child_count-1)?rest:0), elem->layouted_size.h);
+				int new_size;
+				if(elem->childs[i]->design_size.x == 0)
+					new_size = ag_gui_elem_get_preferred_size(elem->childs[i]).x;
+				else if(elem->childs[i]->design_width_relative)
+					new_size = size*elem->childs[i]->design_size.x+((i==elem->child_count-1)?rest:0);
+				else
+					new_size = elem->childs[i]->design_size.x;
+				elem->childs[i]->layouted_size = ag_vec2i(new_size, elem->layouted_size.h);
 
 				struct ag_vec2i dif = ag_vec2i(0,0);
-				if(elem->childs[i]->preferred_size.w < elem->childs[i]->layouted_size.w)
-					dif.w = elem->childs[i]->layouted_size.w - elem->childs[i]->preferred_size.w;
-				if(elem->childs[i]->preferred_size.h < elem->childs[i]->layouted_size.h)
-					dif.h = elem->childs[i]->layouted_size.h - elem->childs[i]->preferred_size.h;
-				elem->childs[i]->layouted_size = ag_vec2i_sub(elem->childs[i]->layouted_size, dif);
+				if(elem->childs[i]->design_width_relative)
+				{
+					if(elem->childs[i]->preferred_size.w < elem->childs[i]->layouted_size.w)
+						dif.w = elem->childs[i]->layouted_size.w - elem->childs[i]->preferred_size.w;
+					if(elem->childs[i]->preferred_size.h < elem->childs[i]->layouted_size.h)
+						dif.h = elem->childs[i]->layouted_size.h - elem->childs[i]->preferred_size.h;
+					elem->childs[i]->layouted_size = ag_vec2i_sub(elem->childs[i]->layouted_size, dif);
+				}
 
-				elem->childs[i]->layouted_pos = ag_vec2i(i*(size+elem->padding)+dif.x/2, dif.y/2);
+				elem->childs[i]->layouted_pos = ag_vec2i(pos+dif.x/2, dif.y/2);
+				pos += new_size + elem->padding;
 				ag_gui_elem_manage_layout(elem->childs[i]);
 			}
 		}
 		break;
 	case AG_GUI_VPANEL:
 		{
-			int size = (elem->layouted_size.y+elem->padding)/elem->child_count - elem->padding;
-			int rest = elem->layouted_size.y - ((size+elem->padding)*elem->child_count-elem->padding);
+			int relcount = 0;
+			int abs_elems_height = 0;
+			for(int i = 0; i < elem->child_count; ++i)
+				if(elem->childs[i]->design_size.x == 0)
+					abs_elems_height += ag_gui_elem_get_preferred_size(elem->childs[i]).y;
+				else if(elem->childs[i]->design_height_relative)
+					relcount += elem->childs[i]->design_size.h;
+				else
+					abs_elems_height += elem->childs[i]->design_size.h;
+
+			if(relcount == 0)
+				relcount = 1; // division by zero
+			int total_size_without_padding = elem->layouted_size.h - (elem->child_count+1) * elem->padding;
+			int size = (total_size_without_padding-abs_elems_height) / relcount;
+			int rest = (total_size_without_padding-abs_elems_height) - size*relcount;
+			int pos = elem->padding;
 			for(int i = 0; i < elem->child_count; ++i)
 			{
-				elem->childs[i]->layouted_size = ag_vec2i(elem->layouted_size.w, size+((i==elem->child_count-1)?rest:0));
+				int new_size;
+				if(elem->childs[i]->design_size.y == 0)
+					new_size = ag_gui_elem_get_preferred_size(elem->childs[i]).y;
+				else if(elem->childs[i]->design_height_relative)
+					new_size = size*elem->childs[i]->design_size.y+((i==elem->child_count-1)?rest:0);
+				else
+					new_size = elem->childs[i]->design_size.y;
+				elem->childs[i]->layouted_size = ag_vec2i(elem->layouted_size.w, new_size);
 
 				struct ag_vec2i dif = ag_vec2i(0,0);
-				if(elem->childs[i]->preferred_size.w < elem->childs[i]->layouted_size.w)
-					dif.w = elem->childs[i]->layouted_size.w - elem->childs[i]->preferred_size.w;
-				if(elem->childs[i]->preferred_size.h < elem->childs[i]->layouted_size.h)
-					dif.h = elem->childs[i]->layouted_size.h - elem->childs[i]->preferred_size.h;
-				elem->childs[i]->layouted_size = ag_vec2i_sub(elem->childs[i]->layouted_size, dif);
+				if(elem->childs[i]->design_height_relative)
+				{
+					if(elem->childs[i]->preferred_size.w < elem->childs[i]->layouted_size.w)
+						dif.w = elem->childs[i]->layouted_size.w - elem->childs[i]->preferred_size.w;
+					if(elem->childs[i]->preferred_size.h < elem->childs[i]->layouted_size.h)
+						dif.h = elem->childs[i]->layouted_size.h - elem->childs[i]->preferred_size.h;
+					elem->childs[i]->layouted_size = ag_vec2i_sub(elem->childs[i]->layouted_size, dif);
+				}
 
-				elem->childs[i]->layouted_pos = ag_vec2i(dif.x/2, i*(size+elem->padding)+dif.y/2);
+				elem->childs[i]->layouted_pos = ag_vec2i(dif.x/2, pos+dif.y/2);
+				pos += new_size + elem->padding;
 				ag_gui_elem_manage_layout(elem->childs[i]);
 			}
 		}
@@ -151,6 +205,69 @@ struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem)
 		elem = elem->parent;
 	}
 	return pos;
+}
+
+struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem)
+{
+	printf("getting pref size for %s %i\n", ag_gui_elem_type_to_string(elem->type),(int) elem->surface);
+	switch(elem->type)
+	{
+		case AG_GUI_NONE:
+			return ag_gui_elem_get_preferred_size(elem->childs[0]);
+		case AG_GUI_SOLID:
+			return ag_vec2i(0,0);
+		case AG_GUI_IMG:
+			return elem->surface?elem->surface->size:ag_vec2i(0,0);
+		case AG_GUI_HPANEL:
+			{
+				struct ag_vec2i size = ag_vec2i(0,0);
+				for(int i = 0; i < elem->child_count; ++i)
+				{
+					struct ag_vec2i elem_size = ag_vec2i(0,0);
+					if(elem->childs[i]->design_size.x == 0)
+						elem_size = ag_gui_elem_get_preferred_size(elem->childs[i]);
+					else
+					{
+						if(!elem->childs[i]->design_width_relative)
+							elem_size.x = elem->childs[i]->design_size.x;
+						if(!elem->childs[i]->design_height_relative)
+							elem_size.y = elem->childs[i]->design_size.y;
+					}
+					if(elem_size.y > size.y)
+						size.y = elem_size.y;
+					size.x += elem_size.x;
+				}
+				return size;			
+			}
+			break;
+		case AG_GUI_VPANEL:
+			{
+				struct ag_vec2i size = ag_vec2i(0,0);
+				for(int i = 0; i < elem->child_count; ++i)
+				{
+					struct ag_vec2i elem_size = ag_vec2i(0,0);
+					if(elem->childs[i]->design_size.x == 0)
+						elem_size = ag_gui_elem_get_preferred_size(elem->childs[i]);
+					else
+					{
+						if(!elem->childs[i]->design_width_relative)
+							elem_size.x = elem->childs[i]->design_size.x;
+						if(!elem->childs[i]->design_height_relative)
+							elem_size.y = elem->childs[i]->design_size.y;
+					}
+					if(elem_size.x > size.x)
+						size.x = elem_size.x;
+					size.y += elem_size.y;
+				}
+				return size;
+			}
+			break;
+		case AG_GUI_BUTTON:
+			return ag_vec2i(120,30);
+		case AG_GUI_LABEL:
+			return ag_font_text_size(ag_font_default, elem->text);
+	}
+	return ag_vec2i(0,0);
 }
 
 

@@ -29,7 +29,8 @@ struct ag_gui_elem
 	struct ag_gui_elem** childs;
 	enum ag_gui_elem_state state;
 	char* onclick; //name of onclick event
-	bool design_size_relative;
+	bool design_width_relative;
+	bool design_height_relative;
 	struct ag_color color;
 	int child_count;
 	char* text;
@@ -53,6 +54,7 @@ void ag_gui_elem_debug(struct ag_gui_elem* elem);
 char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type);
 void ag_gui_elem_manage_layout(struct ag_gui_elem* elem);
 struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem);
+struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem);
 
 void ag_surface_draw_gui(struct ag_surface* surface, struct ag_gui* gui);
 void ag_gui_manage_layout(struct ag_gui* gui);
