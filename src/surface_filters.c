@@ -1,5 +1,6 @@
 #include "surface.h"
-
+#include "platform.h"
+#include <math.h>
 
 void ag_surface_filter_to(struct ag_surface* dst, struct ag_surface* src, enum ag_filter scaler)
 {
@@ -138,9 +139,12 @@ void ag_surface_filter_to(struct ag_surface* dst, struct ag_surface* src, enum a
 				  ((((uint32_t*)src->data)[(x*2+1)+(y*2+1)*src->size.w]&0xfcfcfcfc) >> 2);
 		break;
 	case AG_FILTER_HUESHIFT:
-		for(int y = 0; y < src->size.h; ++y)
-			for(int x = 0; x < src->size.w; ++x)
-				dst->data[x+y*dst->size.w] = ag_hue_shift(src->data[x+y*src->size.w], 30.f);
+		{
+			double val = fmod(ag_get_time(),10)*36;
+			for(int y = 0; y < src->size.h; ++y)
+				for(int x = 0; x < src->size.w; ++x)
+					dst->data[x+y*dst->size.w] = ag_hue_shift(src->data[x+y*src->size.w], val);
+		}
 	}
 }
 
