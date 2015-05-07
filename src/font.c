@@ -27,6 +27,7 @@ struct ag_font* ag_font_new(char* fname, int size)
 		else
 			font->glyphs[i] = 0;
 	}
+	FT_Done_Face(face);
 	return font;
 }
 
@@ -57,6 +58,7 @@ struct ag_font* ag_font_new_from_memory(FT_Byte* data, int data_size, int size)
 		else
 			font->glyphs[i] = 0;
 	}
+	FT_Done_Face(face);
 	return font;
 }
 
