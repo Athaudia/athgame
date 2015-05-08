@@ -81,3 +81,22 @@ float ag_vec2f_prod(struct ag_vec2f vec)
 {
 	return vec.x*vec.y;
 }
+
+
+///////////////
+
+
+struct ag_vec2i ag_vec2f_to_vec2i(struct ag_vec2f vec)
+{
+	return (struct ag_vec2i){.x=(int32_t)vec.x, .y=(int32_t)vec.y};
+}
+
+struct ag_vec2i ag_vec2f_to_vec2i_round(struct ag_vec2f vec)
+{
+	return (struct ag_vec2i){.x=round(vec.x), .y=round(vec.y)};
+}
+
+struct ag_vec2f ag_vec2i_to_vec2f(struct ag_vec2i vec)
+{
+	return (struct ag_vec2f){.x=(float)vec.x, .y=(float)vec.y};
+}

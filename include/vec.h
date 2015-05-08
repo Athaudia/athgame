@@ -44,5 +44,8 @@ struct ag_vec2f ag_vec2f_div(struct ag_vec2f a, float b);
 struct ag_vec2f ag_vec2f_mult(struct ag_vec2f vec, float mult);
 float ag_vec2f_prod(struct ag_vec2f);
 
+struct ag_vec2i ag_vec2f_to_vec2i(struct ag_vec2f vec);
+struct ag_vec2i ag_vec2f_to_vec2i_round(struct ag_vec2f vec);
+struct ag_vec2f ag_vec2i_to_vec2f(struct ag_vec2i vec);
 
 #endif
