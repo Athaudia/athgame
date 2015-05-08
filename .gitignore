@@ -1,2 +1,4 @@
 *.exe
 .tup/
+build-win32/libathgame.a
+build-win32/build/
