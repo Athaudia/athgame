@@ -11,22 +11,22 @@ int ft_size_used;
 
 void* ag_ft_alloc(FT_Memory mem, long size)
 {
-	ft_size_used += size;
+	//ft_size_used += size;
 	//printf("ft used: %i bytes\n", ft_size_used);
 	return malloc(size);
 }
 
 void* ag_ft_realloc(FT_Memory mem, long cur_size, long new_size, void* block)
 {
-	ft_size_used -= cur_size;
-	ft_size_used += new_size;
+	//ft_size_used -= cur_size;
+	//ft_size_used += new_size;
 	//printf("ft used: %i bytes\n", ft_size_used);
 	return realloc(block, new_size);
 }
 
 void ag_ft_free(FT_Memory mem, void* block)
 {
-	ft_size_used -= _msize(block);
+	//ft_size_used -= _msize(block);
 	//printf("ft used: %i bytes\n", ft_size_used);
 	free(block);
 }
