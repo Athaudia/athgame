@@ -2,6 +2,8 @@
 
 #include "math.h"
 
+#define TAU 6.28318530718
+
 struct ag_vec2i ag_vec2i(int32_t x, int32_t y)
 {
 	return (struct ag_vec2i){.x=x, .y=y};
@@ -55,6 +57,11 @@ bool ag_vec2i_point_in_rect(struct ag_vec2i point, struct ag_vec2i rect_pos, str
 struct ag_vec2f ag_vec2f(float x, float y)
 {
 	return (struct ag_vec2f){.x=x, .y=y};
+}
+
+struct ag_vec2f ag_vec2f_from_angle(float angle) //in turns
+{
+	return (struct ag_vec2f){.x=cos(angle*TAU), .y=sin(angle*TAU)};
 }
 
 struct ag_vec2f ag_vec2f_add(struct ag_vec2f a, struct ag_vec2f b)

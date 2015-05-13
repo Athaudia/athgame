@@ -38,6 +38,7 @@ int32_t ag_vec2i_prod(struct ag_vec2i);
 bool ag_vec2i_point_in_rect(struct ag_vec2i point, struct ag_vec2i rect_pos, struct ag_vec2i rect_size);
 
 struct ag_vec2f ag_vec2f(float x, float y);
+struct ag_vec2f ag_vec2f_from_angle(float angle); //in turns
 struct ag_vec2f ag_vec2f_add(struct ag_vec2f a, struct ag_vec2f b);
 struct ag_vec2f ag_vec2f_sub(struct ag_vec2f a, struct ag_vec2f b);
 struct ag_vec2f ag_vec2f_div(struct ag_vec2f a, float b);
