@@ -155,6 +155,7 @@ double ag_get_time()
 	return (double)ticks.QuadPart / (double)freq.QuadPart;
 
 #endif
+	return 0;
 }
 
 void ag_sleep(int ms)
