@@ -31,11 +31,11 @@ struct ag_gui_elem
 	char* onclick; //name of onclick event
 	bool design_width_relative;
 	bool design_height_relative;
-	struct ag_color color;
+	struct ag_color32 color;
 	int child_count;
 	char* text;
 	char* filename;
-	struct ag_surface* surface;
+	struct ag_surface32* surface;
 	int padding;
 };
 
@@ -56,7 +56,7 @@ void ag_gui_elem_manage_layout(struct ag_gui_elem* elem);
 struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem);
 struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem);
 
-void ag_surface_draw_gui(struct ag_surface* surface, struct ag_gui* gui);
+void ag_surface32_draw_gui(struct ag_surface32* surface, struct ag_gui* gui);
 void ag_gui_manage_layout(struct ag_gui* gui);
 struct ag_gui* ag_gui_new_from_file(char* fname);
 void ag_gui_process_event(struct ag_gui* gui, struct ag_event* event);

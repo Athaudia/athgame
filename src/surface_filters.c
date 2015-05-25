@@ -2,7 +2,7 @@
 #include "platform.h"
 #include <math.h>
 
-void ag_surface_filter_to(struct ag_surface* dst, struct ag_surface* src, enum ag_filter scaler)
+void ag_surface32_filter_to(struct ag_surface32* dst, struct ag_surface32* src, enum ag_filter scaler)
 {
 	switch(scaler)
 	{
@@ -82,11 +82,11 @@ void ag_surface_filter_to(struct ag_surface* dst, struct ag_surface* src, enum a
 			for(int x = 0; x < src->size.w; ++x)
 			{
 				/*
-				struct ag_color c = src->data[(x+0)+(y+0)*src->size.w];
+				struct ag_color32 c = src->data[(x+0)+(y+0)*src->size.w];
 				dst->data[(x*2+0)+(y*2+0)*dst->size.w] =	c;
-				dst->data[(x*2+1)+(y*2+0)*dst->size.w] =	(struct ag_color){.r=c.r, .b=0, .g=0, .a=c.a};
-				dst->data[(x*2+0)+(y*2+1)*dst->size.w] =	(struct ag_color){.r=0, .b=c.b, .g=0, .a=c.a};
-				dst->data[(x*2+1)+(y*2+1)*dst->size.w] =	(struct ag_color){.r=0, .b=0, .g=c.g, .a=c.a};
+				dst->data[(x*2+1)+(y*2+0)*dst->size.w] =	(struct ag_color32){.r=c.r, .b=0, .g=0, .a=c.a};
+				dst->data[(x*2+0)+(y*2+1)*dst->size.w] =	(struct ag_color32){.r=0, .b=c.b, .g=0, .a=c.a};
+				dst->data[(x*2+1)+(y*2+1)*dst->size.w] =	(struct ag_color32){.r=0, .b=0, .g=c.g, .a=c.a};
 				*/
 				uint32_t c = ((uint32_t*)src->data)[(x+0)+(y+0)*src->size.w];
 				((uint32_t*)dst->data)[(x*2+0)+(y*2+0)*dst->size.w] = c;

@@ -34,8 +34,8 @@ void ag_ft_free(FT_Memory mem, void* block)
 void ag_init()
 {
 	ag_state_current = 0;
-	agc_white = (struct ag_color){255,255,255,255};
-	agc_black = (struct ag_color){0,0,0,255};
+	agc_white = (struct ag_color32){255,255,255,255};
+	agc_black = (struct ag_color32){0,0,0,255};
 	ag_event_queue = 0;
 	ag_platform_init();
 	ft_size_used = 0;

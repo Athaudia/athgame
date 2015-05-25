@@ -6,14 +6,14 @@ void ag_window_reinit_surfaces(struct ag_window* window)
 {
 	printf("ws: %i", window->size.w);
 	if(window->surface)
-		ag_surface_destroy(window->surface);
+		ag_surface32_destroy(window->surface);
 	if(window->filtered_surface)
-		ag_filtered_surface_destroy(window->filtered_surface);
+		ag_filtered_surface32_destroy(window->filtered_surface);
 
-	window->surface = ag_surface_new(window->size);
-	window->filtered_surface = ag_filtered_surface_new(window->surface);
+	window->surface = ag_surface32_new(window->size);
+	window->filtered_surface = ag_filtered_surface32_new(window->surface);
 	for(int i = 0; i < window->filter_count; ++i)
-		ag_filtered_surface_push(window->filtered_surface, window->filters[i]);
+		ag_filtered_surface32_push(window->filtered_surface, window->filters[i]);
 }
 
 struct ag_window* ag_window_new(struct ag_vec2i size, bool resizeable)
@@ -35,14 +35,14 @@ struct ag_window* ag_window_new(struct ag_vec2i size, bool resizeable)
 
 void ag_window_destroy(struct ag_window* window)
 {
-	ag_surface_destroy(window->surface);
+	ag_surface32_destroy(window->surface);
 	//todo: add platform stuff
 	free(window);
 }
 
 void ag_window_update(struct ag_window* window)
 {
-	ag_filtered_surface_update(window->filtered_surface);
+	ag_filtered_surface32_update(window->filtered_surface);
 	ag_platform_window_update(window);
 }
 

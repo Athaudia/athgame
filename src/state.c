@@ -77,7 +77,7 @@ void* ag_state_default_enter()
 
 void ag_state_default_render(void* data, struct ag_window* window)
 {
-	ag_surface_clear(window->surface, (struct ag_color){.r=200, .g=50, .b=100, .a=255});
+	ag_surface32_clear(window->surface, (struct ag_color32){.r=200, .g=50, .b=100, .a=255});
 }
 
 void ag_state_default_update(void* data, struct ag_window* window)

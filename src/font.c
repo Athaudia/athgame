@@ -20,7 +20,7 @@ struct ag_font* ag_font_new(char* fname, int size)
 			FT_Load_Glyph(face, idx, 0);
 			FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 			font->glyphs[i] = (struct ag_glyph*)malloc(sizeof(struct ag_glyph));
-			font->glyphs[i]->surface = ag_surface_new_from_ft_bitmap(&face->glyph->bitmap);
+			font->glyphs[i]->surface = ag_surface32_new_from_ft_bitmap(&face->glyph->bitmap);
 			font->glyphs[i]->advance = face->glyph->metrics.horiAdvance;
 			font->glyphs[i]->bearing = ag_vec2i(face->glyph->metrics.horiBearingX, -face->glyph->metrics.horiBearingY);			
 		}
@@ -51,7 +51,7 @@ struct ag_font* ag_font_new_from_memory(FT_Byte* data, int data_size, int size)
 			FT_Load_Glyph(face, idx, 0);
 			FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 			font->glyphs[i] = (struct ag_glyph*)malloc(sizeof(struct ag_glyph));
-			font->glyphs[i]->surface = ag_surface_new_from_ft_bitmap(&face->glyph->bitmap);
+			font->glyphs[i]->surface = ag_surface32_new_from_ft_bitmap(&face->glyph->bitmap);
 			font->glyphs[i]->advance = face->glyph->metrics.horiAdvance;
 			font->glyphs[i]->bearing = ag_vec2i(face->glyph->metrics.horiBearingX, -face->glyph->metrics.horiBearingY);			
 		}
@@ -69,7 +69,7 @@ void ag_font_destroy(struct ag_font* font)
 	free(font);
 }
 
-void ag_surface_draw_text(struct ag_surface* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_color color, char* text)
+void ag_surface32_draw_text(struct ag_surface32* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_color32 color, char* text)
 {
 	struct ag_vec2i start = ag_vec2i_mult(pos, 64);
 	struct ag_vec2i p = start;
@@ -82,7 +82,7 @@ void ag_surface_draw_text(struct ag_surface* surface, struct ag_font* font, stru
 		}
 		else if(font->glyphs[(uint8_t)*text])
 		{
-			ag_surface_blit_with_alphachan_as_color_to(surface, font->glyphs[(uint8_t)*text]->surface,  ag_vec2i_div(ag_vec2i_add(p, font->glyphs[(uint8_t)*text]->bearing), 64), color);
+			ag_surface32_blit_with_alphachan_as_color_to(surface, font->glyphs[(uint8_t)*text]->surface,  ag_vec2i_div(ag_vec2i_add(p, font->glyphs[(uint8_t)*text]->bearing), 64), color);
 			p.x += font->glyphs[(uint8_t)*text]->advance;
 		}
 
@@ -90,18 +90,18 @@ void ag_surface_draw_text(struct ag_surface* surface, struct ag_font* font, stru
 	}
 }
 
-void ag_surface_draw_text_centered(struct ag_surface* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color color, char* text)
+void ag_surface32_draw_text_centered(struct ag_surface32* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color, char* text)
 {
 	struct ag_vec2i text_size = ag_font_text_size(font, text);
 	pos = ag_vec2i_sub(ag_vec2i_add(pos, ag_vec2i_div(size,2)), ag_vec2i_div(text_size,2));
 	pos.y += font->ascender;
-	ag_surface_draw_text(surface, font, pos, color, text);
+	ag_surface32_draw_text(surface, font, pos, color, text);
 }
 
 
-struct ag_surface* ag_surface_new_from_ft_bitmap(FT_Bitmap* bitmap)
+struct ag_surface32* ag_surface32_new_from_ft_bitmap(FT_Bitmap* bitmap)
 {
-	struct ag_surface* surface = ag_surface_new(ag_vec2i(bitmap->width, bitmap->rows));
+	struct ag_surface32* surface = ag_surface32_new(ag_vec2i(bitmap->width, bitmap->rows));
 	switch(bitmap->pixel_mode)
 	{
 	case FT_PIXEL_MODE_GRAY:
@@ -109,7 +109,7 @@ struct ag_surface* ag_surface_new_from_ft_bitmap(FT_Bitmap* bitmap)
 			for(int x = 0; x < surface->size.w; ++x)
 			{
 				uint8_t p = bitmap->buffer[x+y*bitmap->pitch];
-				surface->data[x+y*surface->size.w] = (struct ag_color){.r=0,.g=0,.b=0,.a=p};
+				surface->data[x+y*surface->size.w] = (struct ag_color32){.r=0,.g=0,.b=0,.a=p};
 			}
 		break;
 	default:

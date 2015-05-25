@@ -8,7 +8,7 @@
 struct ag_glyph
 {
 	//todo: replace with alpha-chan only surface when implemented
-	struct ag_surface* surface;
+	struct ag_surface32* surface;
 	struct ag_vec2i bearing;
 	uint32_t advance;
 };

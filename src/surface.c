@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-struct ag_color agc_white, agc_black;
+struct ag_color32 agc_white, agc_black;
 
-struct ag_color ag_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+struct ag_color32 ag_color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	return (struct ag_color){.r=r, .g=g, .b=b, .a=a};
+	return (struct ag_color32){.r=r, .g=g, .b=b, .a=a};
 }
 
 
@@ -26,10 +26,10 @@ uint32_t ag_swap_endian_uint32(uint32_t val)
 	return res;
 }
 
-struct ag_surface* ag_surface_new(struct ag_vec2i size)
+struct ag_surface32* ag_surface32_new(struct ag_vec2i size)
 {
-	struct ag_surface* surface = (struct ag_surface*)malloc(sizeof(struct ag_surface));
-	surface->data = (struct ag_color*)malloc(sizeof(struct ag_color) * ag_vec2i_prod(size));
+	struct ag_surface32* surface = (struct ag_surface32*)malloc(sizeof(struct ag_surface32));
+	surface->data = (struct ag_color32*)malloc(sizeof(struct ag_color32) * ag_vec2i_prod(size));
 	surface->size = size;
 	return surface;
 }
@@ -54,7 +54,7 @@ struct bmp_header
 };
 #pragma pack(pop)
 
-struct ag_surface* ag_surface_new_from_file(char* fname)
+struct ag_surface32* ag_surface32_new_from_file(char* fname)
 {
 	//todo: check extension, and handle different formats, bmp only for now
 	//todo: error handling
@@ -76,7 +76,7 @@ struct ag_surface* ag_surface_new_from_file(char* fname)
 	fseek(fil, header.pixel_data_offset, SEEK_SET);
 	fread(data, 1, rowsize*header.height, fil);
 	fclose(fil);
-	struct ag_surface* surface = ag_surface_new(ag_vec2i(header.width, header.height));
+	struct ag_surface32* surface = ag_surface32_new(ag_vec2i(header.width, header.height));
 	for(int y = 0; y < header.height; ++y)
 		for(int x = 0; x < header.width; ++x)
 		{
@@ -90,16 +90,16 @@ struct ag_surface* ag_surface_new_from_file(char* fname)
 }
 
 
-void ag_surface_destroy(struct ag_surface* surface)
+void ag_surface32_destroy(struct ag_surface32* surface)
 {
 	free(surface->data);
 	free(surface);
 }
 
 
-void ag_surface_clear(struct ag_surface* surface, struct ag_color color)
+void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
 {
-	struct ag_color* data = surface->data;
+	struct ag_color32* data = surface->data;
 	if(ag_vec2i_prod(surface->size) % 16 == 0)
 		for(int i = 0; i < ag_vec2i_prod(surface->size)/16; ++i)
 		{
@@ -117,14 +117,14 @@ void ag_surface_clear(struct ag_surface* surface, struct ag_color color)
 			*(data++) = color;
 }
 
-void ag_surface_blit_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos)
+void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos)
 {
-	ag_surface_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
+	ag_surface32_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
 //	for(int y = 0; y < src->size.h; ++y)
 //		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+y*src->size.w, src->size.w*4);
 }
 
-void ag_surface_blit_partial_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
+void ag_surface32_blit_partial_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
 {
 	if(src_size.x > src->size.x - src_pos.x)
 		src_size.x = src->size.x - src_pos.x;
@@ -134,7 +134,7 @@ void ag_surface_blit_partial_to(struct ag_surface* dst, struct ag_surface* src, 
 		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+src_pos.x+(y+src_pos.y)*src->size.w, src_size.w*4);
 }
 
-void ag_surface_blit_clipped_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
+void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
 {
 	struct ag_vec2i src_pos = ag_vec2i(0,0);
 	struct ag_vec2i src_size = src->size;
@@ -161,62 +161,62 @@ void ag_surface_blit_clipped_to(struct ag_surface* dst, struct ag_surface* src, 
 	if(src_size.y > clip_size.y)
 		src_size.y = clip_size.y;
 	if(src_size.x > 0 && src_size.y > 0)
-		ag_surface_blit_partial_to(dst, src, pos, src_pos, src_size);
+		ag_surface32_blit_partial_to(dst, src, pos, src_pos, src_size);
 }
 
-void ag_surface_blit_with_alphachan_as_color_to(struct ag_surface* dst, struct ag_surface* src, struct ag_vec2i dst_pos, struct ag_color color)
+void ag_surface32_blit_with_alphachan_as_color_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color)
 {
 	for(int y = 0; y < src->size.h; ++y)
 		for(int x = 0; x < src->size.w; ++x)
 		{
 			int a = src->data[x+y*src->size.w].a;
-			struct ag_color* d = &dst->data[(x+dst_pos.x)+(y+dst_pos.y)*dst->size.w];
+			struct ag_color32* d = &dst->data[(x+dst_pos.x)+(y+dst_pos.y)*dst->size.w];
 			d->r = ((color.r*a) + (d->r*(255-a))) >> 8;
 			d->g = ((color.g*a) + (d->g*(255-a))) >> 8;
 			d->b = ((color.b*a) + (d->b*(255-a))) >> 8;
 		}
 }
 
-struct ag_filtered_surface* ag_filtered_surface_new(struct ag_surface* input)
+struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* input)
 {
-	struct ag_filtered_surface* surface = (struct ag_filtered_surface*)malloc(sizeof(struct ag_filtered_surface));
+	struct ag_filtered_surface32* surface = (struct ag_filtered_surface32*)malloc(sizeof(struct ag_filtered_surface32));
 	surface->input = input;
 	surface->scale = 1.0;
 	surface->output = input;
 	surface->filter_count = 0;
 	surface->filters = 0;
-	surface->filter_surfaces = (struct ag_surface**)(malloc(sizeof(struct ag_surface*)*1));
+	surface->filter_surfaces = (struct ag_surface32**)(malloc(sizeof(struct ag_surface32*)*1));
 	surface->filter_surfaces[0] = input;
 	return surface;
 }
 
-void ag_filtered_surface_destroy(struct ag_filtered_surface* surface)
+void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
-		ag_surface_destroy(surface->filter_surfaces[i+1]); //1st is input, array is one larger than count
+		ag_surface32_destroy(surface->filter_surfaces[i+1]); //1st is input, array is one larger than count
 	free(surface->filters);
 	free(surface->filter_surfaces);
 	free(surface);
 }
 
-void ag_filtered_surface_push(struct ag_filtered_surface* surface, enum ag_filter filter)
+void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_filter filter)
 {
 	++surface->filter_count;
 	surface->filters = (enum ag_filter*)realloc(surface->filters, sizeof(enum ag_filter*)*surface->filter_count);
-	surface->filter_surfaces = (struct ag_surface**)realloc(surface->filter_surfaces, sizeof(struct ag_surface*)*(1+surface->filter_count));
+	surface->filter_surfaces = (struct ag_surface32**)realloc(surface->filter_surfaces, sizeof(struct ag_surface32*)*(1+surface->filter_count));
 	surface->filters[surface->filter_count-1] = filter;
 	double new_mult = ag_filter_get_scale(filter);
-	struct ag_surface* old = surface->filter_surfaces[surface->filter_count-1];
-	//surface->filter_surfaces[surface->filter_count] = ag_surface_new(ag_vec2i_mult(old->size, new_mult));
-	surface->filter_surfaces[surface->filter_count] = ag_surface_new(ag_vec2i(old->size.x*new_mult, old->size.y*new_mult));
+	struct ag_surface32* old = surface->filter_surfaces[surface->filter_count-1];
+	//surface->filter_surfaces[surface->filter_count] = ag_surface32_new(ag_vec2i_mult(old->size, new_mult));
+	surface->filter_surfaces[surface->filter_count] = ag_surface32_new(ag_vec2i(old->size.x*new_mult, old->size.y*new_mult));
 	surface->scale *= new_mult;
 	surface->output = surface->filter_surfaces[surface->filter_count];
 }
 
-void ag_filtered_surface_update(struct ag_filtered_surface* surface)
+void ag_filtered_surface32_update(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
-		ag_surface_filter_to(surface->filter_surfaces[i+1], surface->filter_surfaces[i], surface->filters[i]);
+		ag_surface32_filter_to(surface->filter_surfaces[i+1], surface->filter_surfaces[i], surface->filters[i]);
 }
 
 
@@ -304,7 +304,7 @@ void ag_hsv_to_rgb( float *r, float *g, float *b, float h, float s, float v )
 }
 
 
-struct ag_color ag_hue_shift(struct ag_color color, float hue)
+struct ag_color32 ag_hue_shift(struct ag_color32 color, float hue)
 {
 	if(hue == 0.f)
 		return color;
@@ -320,5 +320,5 @@ struct ag_color ag_hue_shift(struct ag_color color, float hue)
 	while(h >= 360.f)
 		h -= 360.f;
 	ag_hsv_to_rgb(&rf, &gf, &bf, h, s, v);
-	return (struct ag_color){.r = (uint8_t)(rf*255), .g = (uint8_t) (gf*255), .b = (uint8_t)(bf*255), .a = color.a};
+	return (struct ag_color32){.r = (uint8_t)(rf*255), .g = (uint8_t) (gf*255), .b = (uint8_t)(bf*255), .a = color.a};
 }

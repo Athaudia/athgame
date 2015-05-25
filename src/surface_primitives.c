@@ -1,41 +1,41 @@
 #include "surface.h"
 #include <math.h>
 
-void ag_surface_fill_rect(struct ag_surface* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color color)
+void ag_surface32_fill_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
 {
 	for(int y = 0; y < size.h; ++y)
 		for(int x = 0; x < size.w; ++x)
 			surface->data[(x+pos.x)+(y+pos.y)*surface->size.w] = color;
 }
 
-void ag_surface_draw_rect(struct ag_surface* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color color)
+void ag_surface32_draw_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
 {
 	size.w--;
 	size.h--;
-	ag_surface_draw_line(surface, pos, ag_vec2i(pos.x,pos.y+size.h), color);
-	ag_surface_draw_line(surface, pos, ag_vec2i(pos.x+size.w,pos.y), color);
-	ag_surface_draw_line(surface, ag_vec2i(pos.x,pos.y+size.h), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
-	ag_surface_draw_line(surface, ag_vec2i(pos.x+size.w,pos.y), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
+	ag_surface32_draw_line(surface, pos, ag_vec2i(pos.x,pos.y+size.h), color);
+	ag_surface32_draw_line(surface, pos, ag_vec2i(pos.x+size.w,pos.y), color);
+	ag_surface32_draw_line(surface, ag_vec2i(pos.x,pos.y+size.h), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
+	ag_surface32_draw_line(surface, ag_vec2i(pos.x+size.w,pos.y), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
 }
 
 
-void ag_surface_draw_line(struct ag_surface* surface, struct ag_vec2i start, struct ag_vec2i end, struct ag_color color)
+void ag_surface32_draw_line(struct ag_surface32* surface, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
 {
 	if(start.y == end.y)
 	{
 		if(start.x < end.x)
-			ag_surface_fill_rect(surface, start, ag_vec2i(end.x-start.x+1,1), color);
+			ag_surface32_fill_rect(surface, start, ag_vec2i(end.x-start.x+1,1), color);
 		else
-			ag_surface_fill_rect(surface, end, ag_vec2i(start.x-end.x+1,1), color);
+			ag_surface32_fill_rect(surface, end, ag_vec2i(start.x-end.x+1,1), color);
 		return;
 	}
 
 	if(start.x == end.x)
 	{
 		if(start.y < end.y)
-			ag_surface_fill_rect(surface, start, ag_vec2i(1,end.y-start.y+1), color);
+			ag_surface32_fill_rect(surface, start, ag_vec2i(1,end.y-start.y+1), color);
 		else
-			ag_surface_fill_rect(surface, end, ag_vec2i(1,start.y-end.y+1), color);
+			ag_surface32_fill_rect(surface, end, ag_vec2i(1,start.y-end.y+1), color);
 		return;
 	}
 
@@ -74,7 +74,7 @@ void ag_surface_draw_line(struct ag_surface* surface, struct ag_vec2i start, str
 #define inline
 #endif 
 
-inline void _dla_changebrightness(struct ag_color* from, struct ag_color* to, float br)
+inline void _dla_changebrightness(struct ag_color32* from, struct ag_color32* to, float br)
 {
 	if(br > 1.0)
 		br = 1.0;
@@ -83,14 +83,14 @@ inline void _dla_changebrightness(struct ag_color* from, struct ag_color* to, fl
 	to->b = br * (float)from->b + (1.0-br) * (float)to->b;
 }
 
-inline void _dla_plot(struct ag_surface* img, int x, int y, struct ag_color* col, float br)
+inline void _dla_plot(struct ag_surface32* img, int x, int y, struct ag_color32* col, float br)
 {
-  struct ag_color oc = img->data[x+y*img->size.w];
+  struct ag_color32 oc = img->data[x+y*img->size.w];
   _dla_changebrightness(col, &oc, br);
   img->data[x+y*img->size.w] = oc;
 }
  
-#define plot_(X,Y,D) do{ struct ag_color f_ = color;				\
+#define plot_(X,Y,D) do{ struct ag_color32 f_ = color;				\
   _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
  
  
@@ -101,7 +101,7 @@ inline void _dla_plot(struct ag_surface* img, int x, int y, struct ag_color* col
  
 #define swap_(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
 
-void ag_surface_draw_line_aa(struct ag_surface* img, struct ag_vec2i start, struct ag_vec2i end, struct ag_color color)
+void ag_surface32_draw_line_aa(struct ag_surface32* img, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
 {
 	int x1 = start.x, x2 = end.x, y1 = start.y, y2 = end.y;
   double dx = (double)x2 - (double)x1;

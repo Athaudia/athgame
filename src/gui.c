@@ -25,7 +25,7 @@ struct ag_gui_elem* ag_gui_elem_new()
 	elem->surface = 0;
 	elem->bg = 0;
 	elem->state = AG_GUI_ELEM_STATE_NONE;
-	elem->color = ag_color(0,0,0,255);
+	elem->color = ag_color32(0,0,0,255);
 	return elem;
 }
 
@@ -270,38 +270,38 @@ struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem)
 }
 
 
-static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui_elem* elem, struct ag_vec2i pos, struct ag_vec2i size)
+static void ag_surface32_draw_gui_elem_p(struct ag_surface32* surface, struct ag_gui_elem* elem, struct ag_vec2i pos, struct ag_vec2i size)
 {
 	//printf("sss: %i\n", surface->size.w);
 	if(elem->bg)
-		ag_surface_draw_gui_elem_p(surface, elem->bg, pos, size);
+		ag_surface32_draw_gui_elem_p(surface, elem->bg, pos, size);
 
 	switch(elem->type)
 	{
 	case AG_GUI_NONE:
-		ag_surface_draw_gui_elem_p(surface, elem->childs[0], pos, size);
+		ag_surface32_draw_gui_elem_p(surface, elem->childs[0], pos, size);
 		break;
 	case AG_GUI_SOLID:
-		ag_surface_fill_rect(surface, pos, size, elem->color);
+		ag_surface32_fill_rect(surface, pos, size, elem->color);
 		break;
 	case AG_GUI_IMG:
 		if(!elem->surface && elem->filename)
-			elem->surface = ag_surface_new_from_file(elem->filename); //todo: load from cache
+			elem->surface = ag_surface32_new_from_file(elem->filename); //todo: load from cache
 		if(elem->surface)
-			ag_surface_blit_clipped_to(surface, elem->surface, ag_vec2i_sub(ag_vec2i_add(pos, ag_vec2i_div(size,2)),ag_vec2i_div(elem->surface->size,2)) , pos, size);
+			ag_surface32_blit_clipped_to(surface, elem->surface, ag_vec2i_sub(ag_vec2i_add(pos, ag_vec2i_div(size,2)),ag_vec2i_div(elem->surface->size,2)) , pos, size);
 	case AG_GUI_HPANEL:
 	case AG_GUI_VPANEL:
 		for(int i = 0; i < elem->child_count; ++i)
-			ag_surface_draw_gui_elem_p(surface, elem->childs[i], ag_vec2i_add(pos, elem->childs[i]->layouted_pos), elem->childs[i]->layouted_size);
+			ag_surface32_draw_gui_elem_p(surface, elem->childs[i], ag_vec2i_add(pos, elem->childs[i]->layouted_pos), elem->childs[i]->layouted_size);
 		break;
 	case AG_GUI_BUTTON:
 		{
-			struct ag_color col[5];
+			struct ag_color32 col[5];
 			for(int i = 0; i < 5; ++i)
-				col[i] = ag_color(255*i/4, 255*i/16, 255*i/8, 255);
+				col[i] = ag_color32(255*i/4, 255*i/16, 255*i/8, 255);
 			if(elem->state == AG_GUI_ELEM_STATE_PRESSED)
 				for(int i = 0; i < 5; ++i)
-					col[4-i] = ag_color(255*i/4, 255*i/16, 255*i/8, 255);
+					col[4-i] = ag_color32(255*i/4, 255*i/16, 255*i/8, 255);
 
 			struct ag_vec2i ul1, ul2, ur1, ur2, ll1, ll2, lr1, lr2;
 			ul1 = pos; ul2 = ag_vec2i(ul1.x+1, ul1.y+1);
@@ -309,31 +309,31 @@ static void ag_surface_draw_gui_elem_p(struct ag_surface* surface, struct ag_gui
 			ll1 = ag_vec2i(pos.x, pos.y+size.y-1); ll2 = ag_vec2i(ll1.x+1, ll1.y-1);
 			lr1 = ag_vec2i(pos.x+size.x-1, pos.y+size.y-1); lr2 = ag_vec2i(lr1.x-1, lr1.y-1);
 			if(!elem->bg)
-				ag_surface_fill_rect(surface, pos, size, col[2]);
-			ag_surface_draw_line(surface, ul1, ur1, col[4]);
-			ag_surface_draw_line(surface, ul1, ll1, col[4]);
-			ag_surface_draw_line(surface, lr1, ll1, col[0]);
-			ag_surface_draw_line(surface, lr1, ur1, col[0]);
+				ag_surface32_fill_rect(surface, pos, size, col[2]);
+			ag_surface32_draw_line(surface, ul1, ur1, col[4]);
+			ag_surface32_draw_line(surface, ul1, ll1, col[4]);
+			ag_surface32_draw_line(surface, lr1, ll1, col[0]);
+			ag_surface32_draw_line(surface, lr1, ur1, col[0]);
 
-			ag_surface_draw_line(surface, ul2, ur2, col[3]);
-			ag_surface_draw_line(surface, ul2, ll2, col[3]);
-			ag_surface_draw_line(surface, lr2, ll2, col[1]);
-			ag_surface_draw_line(surface, lr2, ur2, col[1]);
+			ag_surface32_draw_line(surface, ul2, ur2, col[3]);
+			ag_surface32_draw_line(surface, ul2, ll2, col[3]);
+			ag_surface32_draw_line(surface, lr2, ll2, col[1]);
+			ag_surface32_draw_line(surface, lr2, ur2, col[1]);
 			if(elem->child_count)
-				ag_surface_draw_gui_elem_p(surface, elem->childs[0], ag_vec2i_add(pos, elem->childs[0]->layouted_pos), elem->childs[0]->layouted_size);
+				ag_surface32_draw_gui_elem_p(surface, elem->childs[0], ag_vec2i_add(pos, elem->childs[0]->layouted_pos), elem->childs[0]->layouted_size);
 		}
 		break;
 	case AG_GUI_LABEL:
-		ag_surface_draw_text_centered(surface, ag_font_default, pos, size, ag_color(127*1.5,95*1.5,112*1.5,255), elem->text);
+		ag_surface32_draw_text_centered(surface, ag_font_default, pos, size, ag_color32(127*1.5,95*1.5,112*1.5,255), elem->text);
 		break;
 	default:
 		break;
 	}	
 }
 
-void ag_surface_draw_gui(struct ag_surface* surface, struct ag_gui* gui)
+void ag_surface32_draw_gui(struct ag_surface32* surface, struct ag_gui* gui)
 {
-	ag_surface_draw_gui_elem_p(surface, gui->elem, gui->elem->layouted_pos, gui->elem->layouted_size);
+	ag_surface32_draw_gui_elem_p(surface, gui->elem, gui->elem->layouted_pos, gui->elem->layouted_size);
 }
 
 void ag_gui_manage_layout(struct ag_gui* gui)

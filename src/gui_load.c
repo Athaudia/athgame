@@ -165,7 +165,7 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 				int r = strtol(vals[i], &end, 10);
 				int g = strtol(end+1, &end, 10);
 				int b = strtol(end+1, &end, 10);
-				elem->color = ag_color(r, g, b, 255);
+				elem->color = ag_color32(r, g, b, 255);
 			}
 			else
 			{

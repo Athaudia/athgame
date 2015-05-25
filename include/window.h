@@ -5,11 +5,11 @@
 
 struct ag_window
 {
-	struct ag_surface* surface;
+	struct ag_surface32* surface;
 	struct ag_vec2i size;
 	int filter_count;
 	enum ag_filter* filters;
-	struct ag_filtered_surface* filtered_surface;
+	struct ag_filtered_surface32* filtered_surface;
 	struct ag_vec2i mouse_pos;
 	struct ag_platform_window_internal internal;
 };

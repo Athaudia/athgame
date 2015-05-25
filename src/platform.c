@@ -32,7 +32,7 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		break;
 	case WM_PAINT:
 		{
-			struct ag_surface* surface = window->filtered_surface->output;
+			struct ag_surface32* surface = window->filtered_surface->output;
 			BITMAPINFO info;
 			PAINTSTRUCT ps;
 			info.bmiHeader.biSize = sizeof(BITMAPINFO);
