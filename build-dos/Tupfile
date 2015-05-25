@@ -1,0 +1,2 @@
+: foreach ../src/*.c |> i586-pc-msdosdjgpp-gcc -c -DPLATFORM_DOS -std=c11 -O3 %f -Werror -Wall -I../include -IC:\Libs\freetype-2.5.5\include -o %o |> build/%B.o
+: build/*.o |> i586-pc-msdosdjgpp-ar rcs %o %f |> libathgame.a
