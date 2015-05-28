@@ -4,3 +4,5 @@ build-win32/libathgame.a
 build-win32/build/
 build-dos/build/
 build-dos/libathgame.a
+docs/html
+docs/latex
