@@ -26,6 +26,12 @@ uint32_t ag_swap_endian_uint32(uint32_t val)
 	return res;
 }
 
+/**
+ * Creates a new surface of specified size.
+ * \memberof ag_surface32
+ * @param size Size of the new surface.
+ * @return The new surface.
+ */
 struct ag_surface32* ag_surface32_new(struct ag_vec2i size)
 {
 	struct ag_surface32* surface = (struct ag_surface32*)malloc(sizeof(struct ag_surface32));
@@ -35,6 +41,9 @@ struct ag_surface32* ag_surface32_new(struct ag_vec2i size)
 }
 
 #pragma pack(push, 1)
+/**
+ * \private
+ */
 struct bmp_header
 {
 	uint16_t magic;
@@ -54,6 +63,14 @@ struct bmp_header
 };
 #pragma pack(pop)
 
+/**
+ * Loads a file into a surface.
+ * 
+ * Currently only a subset of .bmp supported.
+ * \memberof ag_surface32
+ * @param fname Name of the file.
+ * @return The new surface.
+ */
 struct ag_surface32* ag_surface32_new_from_file(char* fname)
 {
 	//todo: check extension, and handle different formats, bmp only for now
@@ -89,14 +106,23 @@ struct ag_surface32* ag_surface32_new_from_file(char* fname)
 	return surface;
 }
 
-
-void ag_surface32_destroy(struct ag_surface32* surface)
+/**
+ * Destroys the surface.
+ * \memberof ag_surface32
+ * @param surface The surface to destroy.
+ */
+void ag_surface32_destroy(ag_surface32* surface)
 {
 	free(surface->data);
 	free(surface);
 }
 
-
+/**
+ * Clears/Fills the surface with a given color.
+ * \memberof ag_surface32
+ * @param surface The surface to clear.
+ * @param color The color that the surface will be after the operation.
+ */
 void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
 {
 	struct ag_color32* data = surface->data;
@@ -117,6 +143,13 @@ void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
 			*(data++) = color;
 }
 
+/**
+ * Draws one surface onto another, ignoring alpha or key color.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ */
 void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos)
 {
 	ag_surface32_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
@@ -124,6 +157,15 @@ void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, st
 //		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+y*src->size.w, src->size.w*4);
 }
 
+/**
+ * Draws a sub rectangle of one surface onto another, ignoring alpha or key color.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param src_pos The position of the sub rectangle on the source surface.
+ * @param src_size The size of the sub rectangle on the source surface.
+ */
 void ag_surface32_blit_partial_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
 {
 	if(src_size.x > src->size.x - src_pos.x)
@@ -134,7 +176,16 @@ void ag_surface32_blit_partial_to(struct ag_surface32* dst, struct ag_surface32*
 		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+src_pos.x+(y+src_pos.y)*src->size.w, src_size.w*4);
 }
 
-void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
+/**
+ * Draws one surface onto another, only drawing inside the target's clipping rectangle, ignoring alpha or key color.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param clip_pos The position of the clipping rectangle on the target surface.
+ * @param clip_size The size of the clipping rectangle on the target surface.
+ */
+void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
 {
 	struct ag_vec2i src_pos = ag_vec2i(0,0);
 	struct ag_vec2i src_size = src->size;
@@ -164,6 +215,14 @@ void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32*
 		ag_surface32_blit_partial_to(dst, src, pos, src_pos, src_size);
 }
 
+/**
+ * Draws one surface onto another, ignoring the source image's color, and instead alpha blending(using the source image's alpha channel) the given color onto it.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param color The color to draw.
+ */
 void ag_surface32_blit_with_alphachan_as_color_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color)
 {
 	for(int y = 0; y < src->size.h; ++y)
