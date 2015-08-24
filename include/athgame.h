@@ -3,6 +3,7 @@
 #include "audio_region.h"
 #include "audio_stream.h"
 #include "events.h"
+#include "error.h"
 #include "font.h"
 #include "gui.h"
 #include "platform.h"

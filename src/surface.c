@@ -111,7 +111,7 @@ struct ag_surface32* ag_surface32_new_from_file(char* fname)
  * \memberof ag_surface32
  * @param surface The surface to destroy.
  */
-void ag_surface32_destroy(ag_surface32* surface)
+void ag_surface32_destroy(struct ag_surface32* surface)
 {
 	free(surface->data);
 	free(surface);
@@ -189,20 +189,20 @@ void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32*
 {
 	struct ag_vec2i src_pos = ag_vec2i(0,0);
 	struct ag_vec2i src_size = src->size;
-	if(clip_pos.x > pos.x)
+	if(clip_pos.x > dst_pos.x)
 	{
-		src_pos.x = clip_pos.x - pos.x;
-		pos.x = clip_pos.x;
+		src_pos.x = clip_pos.x - dst_pos.x;
+		dst_pos.x = clip_pos.x;
 	}
 	else
-		clip_size.x -= pos.x-clip_pos.x;
-	if(clip_pos.y > pos.y)
+		clip_size.x -= dst_pos.x-clip_pos.x;
+	if(clip_pos.y > dst_pos.y)
 	{
-		src_pos.y = clip_pos.y - pos.y;
-		pos.y = clip_pos.y;
+		src_pos.y = clip_pos.y - dst_pos.y;
+		dst_pos.y = clip_pos.y;
 	}
 	else
-		clip_size.y -= pos.y-clip_pos.y;
+		clip_size.y -= dst_pos.y-clip_pos.y;
 
 	 //image size
 
@@ -212,7 +212,7 @@ void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32*
 	if(src_size.y > clip_size.y)
 		src_size.y = clip_size.y;
 	if(src_size.x > 0 && src_size.y > 0)
-		ag_surface32_blit_partial_to(dst, src, pos, src_pos, src_size);
+		ag_surface32_blit_partial_to(dst, src, dst_pos, src_pos, src_size);
 }
 
 /**
@@ -236,6 +236,12 @@ void ag_surface32_blit_with_alphachan_as_color_to(struct ag_surface32* dst, stru
 		}
 }
 
+/**
+ * Creates a new filtered surface using input.
+ * \memberof filtered_surface32
+ * @param input The surface that is going to be filtered.
+ * @return The new filtered surface.
+ */
 struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* input)
 {
 	struct ag_filtered_surface32* surface = (struct ag_filtered_surface32*)malloc(sizeof(struct ag_filtered_surface32));
@@ -249,6 +255,11 @@ struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* inp
 	return surface;
 }
 
+/**
+ * Destroys the filtered surface.
+ * \memberof filtered_surface32
+ * @param surface The filtered surface to destroy.
+ */
 void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
@@ -258,6 +269,12 @@ void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface)
 	free(surface);
 }
 
+/**
+ * Adds a new filter to the filter stack.
+ * \memberof filtered_surface32
+ * @param surface The surface which to add the filter to.
+ * @param filter The filter to add.
+ */
 void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_filter filter)
 {
 	++surface->filter_count;
@@ -272,14 +289,60 @@ void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_f
 	surface->output = surface->filter_surfaces[surface->filter_count];
 }
 
+/**
+ * Updates the output of the filtered surface.
+ * \memberof filtered_surface32
+ * @param surface The surface to update.
+ */
 void ag_filtered_surface32_update(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
 		ag_surface32_filter_to(surface->filter_surfaces[i+1], surface->filter_surfaces[i], surface->filters[i]);
 }
 
+/**
+ * Replaces the input surface of a filtered surface with a different one.
+ * \memberof filtered_surface32
+ * @param surface       The filtered surface.
+ * @param input         The new input surface.
+ * @param destroy_input Call ag_surface32_destroy on the old input surface?
+ */
+void ag_filtered_surface32_replace_input(struct ag_filtered_surface32* surface, struct ag_surface32* input, bool destroy_input)
+{
+	if(destroy_input)
+		ag_surface32_destroy(surface->filter_surfaces[0]);
+	for(int i = 1; i < surface->filter_count+1; ++i)
+		ag_surface32_destroy(surface->filter_surfaces[i]);
+	surface->input = input;
+	surface->filter_surfaces[0] = input;
+	for(int i = 0; i < surface->filter_count; ++i)
+	{
+		double new_mult = ag_filter_get_scale(surface->filters[i]);
+		surface->filter_surfaces[i+1] = ag_surface32_new(ag_vec2i(surface->filter_surfaces[i]->size.x*new_mult, surface->filter_surfaces[i]->size.y*new_mult));
+	}
+	surface->output = surface->filter_surfaces[surface->filter_count];
+}
 
+/**
+ * Removes all filters, making the filtered surface a 1:1 representation
+ * @param surface The Filtered surface
+ */
+void ag_filtered_surface32_reset(struct ag_filtered_surface32* surface)
+{
+	for(int i = 0; i < surface->filter_count; ++i)
+		ag_surface32_destroy(surface->filter_surfaces[i+1]);
+	surface->filter_count = 0;
+	surface->filters = (enum ag_filter*)realloc(surface->filters, sizeof(enum ag_filter*)*surface->filter_count);
+	surface->filter_surfaces = (struct ag_surface32**)realloc(surface->filter_surfaces, sizeof(struct ag_surface32*)*(1+surface->filter_count));
 
+	surface->scale = 1;
+	surface->filter_surfaces[0] = surface->input;
+	surface->output = surface->input;
+}
+
+/**
+ * \private
+ */
 void ag_rgb_to_hsv( float r, float g, float b, float *h, float *s, float *v )
 {
 	float min, max, delta;
@@ -311,7 +374,9 @@ void ag_rgb_to_hsv( float r, float g, float b, float *h, float *s, float *v )
 		*h += 360.f;
 }
 
-//http://www.cs.rit.edu/~ncs/color/t_convert.html
+/** http://www.cs.rit.edu/~ncs/color/t_convert.html
+ * \private
+ */
 void ag_hsv_to_rgb( float *r, float *g, float *b, float h, float s, float v )
 {
 	int i;
@@ -362,7 +427,9 @@ void ag_hsv_to_rgb( float *r, float *g, float *b, float h, float s, float v )
 	}
 }
 
-
+/**
+ * \private
+ */
 struct ag_color32 ag_hue_shift(struct ag_color32 color, float hue)
 {
 	if(hue == 0.f)

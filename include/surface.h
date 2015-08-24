@@ -57,6 +57,8 @@ struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* inp
 void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface);
 void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_filter filter);
 void ag_filtered_surface32_update(struct ag_filtered_surface32* surface);
+void ag_filtered_surface32_replace_input(struct ag_filtered_surface32* surface, struct ag_surface32* input, bool destroy_input);
+void ag_filtered_surface32_reset(struct ag_filtered_surface32* surface);
 
 //surface_filters.c
 void ag_surface32_filter_to(struct ag_surface32* dst, struct ag_surface32* src, enum ag_filter scaler);

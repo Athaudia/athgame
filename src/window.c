@@ -1,7 +1,6 @@
 #include "window.h"
 #include <stdlib.h>
 
-
 void ag_window_reinit_surfaces(struct ag_window* window)
 {
 	printf("ws: %i", window->size.w);
@@ -16,6 +15,13 @@ void ag_window_reinit_surfaces(struct ag_window* window)
 		ag_filtered_surface32_push(window->filtered_surface, window->filters[i]);
 }
 
+/**
+ * Creates new window
+ * \memberof ag_window
+ * @param size Size of the window. (sometimes a different size than given will be set)
+ * @param resizeable Should the window be resizeable? (Not avaialble on all platforms)
+ * @return The new window.
+ */
 struct ag_window* ag_window_new(struct ag_vec2i size, bool resizeable)
 {
 	struct ag_window* window = (struct ag_window*)malloc(sizeof(struct ag_window));

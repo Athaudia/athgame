@@ -1,2 +1,2 @@
-: foreach ../src/*.c |> gcc -c -DPLATFORM_WIN32 -std=c99 -O3 %f -Werror -Wall -I../include -IC:\Libs\freetype-2.5.5\include -o %o |> build/%B.o
+: foreach ../src/*.c |> gcc -c -DPLATFORM_WIN32 -std=c99 -O3 %f -Werror -Wall -I../include -IC:\Libs\freetype-2.6\include -o %o |> build/%B.o
 : build/*.o |> ar rcs %o %f |> libathgame.a

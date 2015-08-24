@@ -1,0 +1,4 @@
+: foreach ../src/*.c |> gcc -c -DPLATFORM_LINUX_FB -std=gnu99 -O3 %f -Werror -Wall -I../include -I/usr/include/freetype2 -o %o |> build/%B.o
+: build/*.o |> ar rcs %o %f |> libathgame.a
+: libathgame.a ../test/test.c |> gcc -static -DPLATFORM_LINUX_FB -std=gnu99 -O3 ../test/test.c -Werror -Wall -L. -lathgame -I../include -I/usr/include/freetype2 -o %o |> test
+: libathgame.a ../test/test.c |> gcc -static -DPLATFORM_LINUX_FB -std=gnu99 -O0 -gdwarf-3 ../test/test.c -Werror -Wall -L. -lathgame -I../include -I/usr/include/freetype2 -o %o |> test_dbg

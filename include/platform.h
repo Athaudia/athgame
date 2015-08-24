@@ -6,6 +6,10 @@
 #include <windowsx.h>
 #endif
 
+#ifdef PLATFORM_LINUX_FB
+#include <linux/fb.h>
+#endif
+
 #include "vec.h"
 
 struct ag_window;
@@ -14,6 +18,12 @@ struct ag_platform_window_internal
 {
 #ifdef PLATFORM_WIN32
 	HWND hwnd;
+#endif
+#ifdef PLATFORM_LINUX_FB
+    int fbfd;
+    struct fb_var_screeninfo vinfo;
+    struct fb_fix_screeninfo finfo;
+    char *fbp;
 #endif
 };
 
