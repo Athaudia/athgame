@@ -6,6 +6,8 @@
 #include "error.h"
 #include "font.h"
 #include "gui.h"
+#include "irc.h"
+#include "net.h"
 #include "platform.h"
 #include "state.h"
 #include "surface.h"
