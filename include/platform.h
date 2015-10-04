@@ -1,6 +1,10 @@
 #ifndef GUARD_PLATFORM_H
 #define GUARD_PLATFORM_H
 
+#ifdef PLATFORM_LINUX_FB
+#define PLATFORM_LINUX
+#endif
+
 #ifdef PLATFORM_WIN32
 #include <windows.h>
 #include <windowsx.h>
