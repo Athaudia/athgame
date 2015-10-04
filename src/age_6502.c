@@ -151,7 +151,7 @@ void age_6502_print_next_instruction(struct age_6502* cpu)
 	case 0xC8: printf("INY\n");      break;
 
 	case 0x4C: printf("JMP"); D_ABS  break;
-	case 0x6C: printf("JMP ($%04x)\n", age_6502_read16(cpu, cpu->pc+1));
+	case 0x6C: printf("JMP ($%04x)\n", age_6502_read16(cpu, cpu->pc+1)); break;
 
 	case 0x20: printf("JSR"); D_ABS  break;
 
@@ -850,7 +850,9 @@ void age_6502_exec(struct age_6502* cpu)
 		cpu->f_n = cpu->a >> 7;
 		break;
 
-		//illegals
+		//----illegals----
+		
+	
 		//DOP (double nop)
 	case 0x80: case 0x82: case 0x89: case 0xC2: case 0xE2:
 		cpu->cycle += 2;
@@ -864,6 +866,8 @@ void age_6502_exec(struct age_6502* cpu)
 		cpu->cycle += 4;
 		cpu->pc++;
 		break;
+
+	
 
 
 	}
