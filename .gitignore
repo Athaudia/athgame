@@ -12,3 +12,4 @@ build-linux-fb/build/
 docs/html
 docs/latex
 *.a
+*.ath
