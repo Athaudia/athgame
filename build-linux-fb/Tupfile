@@ -1,6 +1,6 @@
-: foreach ../src/*.c |> gcc -c -DPLATFORM_LINUX_FB -std=gnu99 -O3 %f -Werror -Wall -I../include -I/usr/include/freetype2 -o %o |> build/%B.o
+: foreach ../src/*.c |> musl-gcc -c -DPLATFORM_LINUX_FB -std=gnu99 -O3 %f -Werror -Wall -I../include -I/usr/include/linux -I/usr/include/freetype2 -o %o |> build/%B.o
 : build/*.o |> ar rcs %o %f |> libathgame.a
-: foreach ../src/*.c |> gcc -c -DPLATFORM_LINUX_FB -std=gnu99 -O0 -g %f -Werror -Wall -I../include -I/usr/include/freetype2 -o %o |> build/%B.o_dbg
+: foreach ../src/*.c |> musl-gcc -c -DPLATFORM_LINUX_FB -std=gnu99 -O0 -g %f -Werror -Wall -I../include -I/usr/include/linux -I/usr/include/freetype2 -o %o |> build/%B.o_dbg
 : build/*.o_dbg |> ar rcs %o %f |> libathgame_dbg.a
-: libathgame.a ../test/test.c |> gcc -DPLATFORM_LINUX_FB -std=gnu99 -O3 ../test/test.c -Werror -Wall -lncursesw -L. -lathgame -I../include -I/usr/include/freetype2 -o %o |> test
-: libathgame_dbg.a ../test/test.c |> gcc -DPLATFORM_LINUX_FB -std=gnu99 -O0 -g ../test/test.c -Werror -Wall -lncursesw -L. -lathgame_dbg -I../include -I/usr/include/freetype2 -o %o |> test_dbg
+: libathgame.a ../test/test.c |> musl-gcc -DPLATFORM_LINUX_FB -std=gnu99 -O3 ../test/test.c -Werror -Wall -lncursesw -L. -lathgame -I../include -I/usr/include/freetype2 -o %o |> test
+: libathgame_dbg.a ../test/test.c |> musl-gcc -DPLATFORM_LINUX_FB -std=gnu99 -O0 -g ../test/test.c -Werror -Wall -lncursesw -L. -lathgame_dbg -I../include -I/usr/include/freetype2 -o %o |> test_dbg
