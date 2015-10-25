@@ -7,6 +7,7 @@
 #include "font.h"
 #include "gui.h"
 #include "irc.h"
+#include "list.h"
 #include "net.h"
 #include "platform.h"
 #include "state.h"
