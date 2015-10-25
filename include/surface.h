@@ -1,8 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include "vec.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
+//#include <ft2build.h>
+//#include FT_FREETYPE_H
 
 struct ag_font;
 
@@ -73,4 +73,4 @@ void ag_surface32_draw_line_aa(struct ag_surface32* surface, struct ag_vec2i sta
 //font.c
 void ag_surface32_draw_text(struct ag_surface32* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_color32 color, char* text);
 void ag_surface32_draw_text_centered(struct ag_surface32* surface, struct ag_font* font, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color, char* text);
-struct ag_surface32* ag_surface32_new_from_ft_bitmap(FT_Bitmap* bitmap);
+//struct ag_surface32* ag_surface32_new_from_ft_bitmap(FT_Bitmap* bitmap);

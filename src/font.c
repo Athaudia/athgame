@@ -1,6 +1,6 @@
 #include "font.h"
 #include <math.h>
-FT_Library ag_ft;
+/*FT_Library ag_ft;
 
 struct ag_font* ag_font_new(char* fname, int size)
 {
@@ -140,3 +140,4 @@ struct ag_vec2i ag_font_text_size(struct ag_font* font, char* text)
 	}
 	return ag_vec2i_div(size, 64);
 }
+*/

@@ -1,6 +1,6 @@
 #include "gui.h"
 #include <stdio.h>
-
+#include <stdlib.h>
 
 struct ag_font* ag_font_default;
 
@@ -264,7 +264,8 @@ struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem)
 		case AG_GUI_BUTTON:
 			return ag_vec2i(120,30);
 		case AG_GUI_LABEL:
-			return ag_font_text_size(ag_font_default, elem->text);
+			;
+			//return ag_font_text_size(ag_font_default, elem->text);
 	}
 	return ag_vec2i(0,0);
 }

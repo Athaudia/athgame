@@ -1,6 +1,7 @@
 #include "state.h"
 #include "events.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 struct ag_state* ag_state_current;
 

@@ -1,5 +1,6 @@
 #include "surface.h"
 #include <math.h>
+#include <stdlib.h>
 
 void ag_surface32_fill_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
 {

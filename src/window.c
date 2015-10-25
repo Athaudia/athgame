@@ -1,5 +1,6 @@
 #include "window.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 void ag_window_reinit_surfaces(struct ag_window* window)
 {

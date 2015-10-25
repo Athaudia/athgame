@@ -1,5 +1,7 @@
 #include "gui.h"
-
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 struct ag_gui* ag_gui_new_from_file(char* fname)
 {
