@@ -75,7 +75,7 @@ void ag_list__push_back(struct ag_list* list, void* data)
 struct ag_list_iter* ag_list_iter__new(struct ag_list* list)
 {
 	struct ag_list_iter* iter = (struct ag_list_iter*)malloc(sizeof(struct ag_list_iter));
-	iter->elem = list->front;
+	iter->elem = 0;
 	iter->list = list;
 	return iter;
 }
@@ -87,7 +87,10 @@ void ag_list_iter__destroy(struct ag_list_iter* iter)
 
 bool ag_list_iter__next(struct ag_list_iter* iter)
 {
-	iter->elem = iter->elem->next;
+	if(iter->elem)
+		iter->elem = iter->elem->next;
+	else
+		iter->elem = iter->list->front;
 	return iter->elem;
 }
 
