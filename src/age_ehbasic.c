@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stropts.h>
+//#include <stropts.h>
 //#include <ncurses.h>
 
 uint8_t age_ehbasic_cpu_read_mem(void* s, uint16_t pos)
