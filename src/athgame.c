@@ -37,6 +37,7 @@ void ag_init()
 	agc_white = (struct ag_color32){255,255,255,255};
 	agc_black = (struct ag_color32){0,0,0,255};
 	agc_magic_pink = (struct ag_color32){255,0,255,255};
+	agc_transparent = (struct ag_color32){0,0,0,0};
 	ag_event_queue = 0;
 	ag_platform_init();
 

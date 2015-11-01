@@ -11,7 +11,7 @@ struct ag_color32
 	uint8_t b, g, r, a;
 };
 
-extern struct ag_color32 agc_white, agc_black, agc_magic_pink;
+extern struct ag_color32 agc_white, agc_black, agc_magic_pink, agc_transparent;
 
 struct ag_color32 ag_color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 struct ag_color32 ag_hue_shift(struct ag_color32 color, float hue);
