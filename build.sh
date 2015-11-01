@@ -1,4 +1,4 @@
 #!/bin/bash
 pushd ..
-tup build-linux-fb
+tup build-win64
 popd

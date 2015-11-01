@@ -13,3 +13,6 @@ docs/html
 docs/latex
 *.a
 *.ath
+build-win64/build
+build-win64/test
+build-win64/test_dbg
