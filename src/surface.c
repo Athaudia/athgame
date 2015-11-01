@@ -4,13 +4,17 @@
 #include <stdio.h>
 #include <string.h>
 
-struct ag_color32 agc_white, agc_black;
+struct ag_color32 agc_white, agc_black, agc_magic_pink;
 
 struct ag_color32 ag_color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	return (struct ag_color32){.r=r, .g=g, .b=b, .a=a};
 }
 
+bool ag_color32_is_equal(struct ag_color32 a, struct ag_color32 b)
+{
+	return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+}
 
 uint32_t ag_swap_endian_uint32(uint32_t val)
 {
@@ -106,6 +110,43 @@ struct ag_surface32* ag_surface32_new_from_file(char* fname)
 	return surface;
 }
 
+struct ag_surface32* ag_surface32_new_from_file_with_color_key(char* fname, struct ag_color32 color_key)
+{
+	//todo: check extension, and handle different formats, bmp only for now
+	//todo: error handling
+	FILE* fil = fopen(fname, "rb");
+	struct bmp_header header;
+	fread(&header, sizeof(struct bmp_header), 1, fil);
+
+	if(header.magic != 0x4d42)
+		return 0;
+	if(header.dib_header_size != 40)
+		return 0;
+	if(header.planes != 1)
+		return 0;
+	if(header.bitdepth != 24)
+		return 0;
+
+	int rowsize = ((header.bitdepth*header.width+31)/32)*4;
+	uint8_t* data = (uint8_t*)malloc(rowsize*header.height);
+	fseek(fil, header.pixel_data_offset, SEEK_SET);
+	fread(data, 1, rowsize*header.height, fil);
+	fclose(fil);
+	struct ag_surface32* surface = ag_surface32_new(ag_vec2i(header.width, header.height));
+	for(int y = 0; y < header.height; ++y)
+		for(int x = 0; x < header.width; ++x)
+		{
+			struct ag_color32 col = ag_color32(data[x*3+y*rowsize+2], data[x*3+y*rowsize+1], data[x*3+y*rowsize], 255);
+			if(ag_color32_is_equal(col, color_key))
+				surface->data[x+(surface->size.h-y-1)*surface->size.w] = ag_color32(0,0,0,0);
+			else
+				surface->data[x+(surface->size.h-y-1)*surface->size.w] = col;
+		}
+
+	return surface;
+}
+
+
 /**
  * Destroys the surface.
  * \memberof ag_surface32
@@ -153,8 +194,6 @@ void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
 void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos)
 {
 	ag_surface32_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
-//	for(int y = 0; y < src->size.h; ++y)
-//		memcpy(dst->data+dst_pos.x+(dst_pos.y+y)*dst->size.w, src->data+y*src->size.w, src->size.w*4);
 }
 
 /**

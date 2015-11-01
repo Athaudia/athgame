@@ -11,10 +11,11 @@ struct ag_color32
 	uint8_t b, g, r, a;
 };
 
-extern struct ag_color32 agc_white, agc_black;
+extern struct ag_color32 agc_white, agc_black, agc_magic_pink;
 
 struct ag_color32 ag_color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 struct ag_color32 ag_hue_shift(struct ag_color32 color, float hue);
+bool ag_color32_is_equal(struct ag_color32 a, struct ag_color32 b);
 
 struct ag_surface32
 {
@@ -44,6 +45,7 @@ struct ag_filtered_surface32
 
 struct ag_surface32* ag_surface32_new(struct ag_vec2i size);
 struct ag_surface32* ag_surface32_new_from_file(char* fname);
+struct ag_surface32* ag_surface32_new_from_file_with_color_key(char* fname, struct ag_color32);
 void ag_surface32_destroy(struct ag_surface32* surface);
 
 void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color);
