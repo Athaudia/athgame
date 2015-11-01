@@ -38,6 +38,11 @@ void ag_init()
 	agc_black = (struct ag_color32){0,0,0,255};
 	ag_event_queue = 0;
 	ag_platform_init();
+
+#ifdef PLATFORM_WIN32
+	WSADATA data;
+	WSAStartup(MAKEWORD(2,2), &data);
+#endif
 	//ft_size_used = 0;
 
 	//struct FT_MemoryRec_* ftmem = (struct FT_MemoryRec_*)malloc(sizeof(struct FT_MemoryRec_));

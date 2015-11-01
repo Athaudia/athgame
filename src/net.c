@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <netinet/tcp.h>
 #include <fcntl.h>
+#elif PLATFORM_WIN32
+#include <ws2tcpip.h>
 #endif
 
 #include <string.h>
@@ -27,9 +29,10 @@ struct ag_tcp_con* ag_tcp_con_new(char* addr, char* port)
 	connect(con->sock, res->ai_addr, res->ai_addrlen);
 
 	int f = 1;
-	setsockopt(con->sock, IPPROTO_TCP, TCP_NODELAY, &f, sizeof(int));
+	setsockopt(con->sock, IPPROTO_TCP, TCP_NODELAY, (char*)&f, sizeof(int));
 #ifdef PLATFORM_WIN32
-	//todo: make nonblocking
+	u_long mode = 1;
+	ioctlsocket(con->sock, FIONBIO, &mode);
 #else
 	fcntl(con->sock, F_SETFL, O_NONBLOCK);
 #endif

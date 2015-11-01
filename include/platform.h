@@ -6,6 +6,7 @@
 #endif
 
 #ifdef PLATFORM_WIN32
+#include <winsock2.h> //have to include it before windows.h
 #include <windows.h>
 #include <windowsx.h>
 #endif
