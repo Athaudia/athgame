@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ag_gui* ag_gui_new_from_file(char* fname)
+struct ag_gui* ag_gui__new_from_file(char* fname)
 {
 	FILE* fil = fopen(fname, "rb");
 	fseek(fil, 0, SEEK_END);
@@ -49,7 +49,7 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 	//for(int i = 0; i < line_count; ++i)
 	//	printf("line (%i): (%s) (%s)\n", indent[i], lines[i], vals[i]);
 
-	struct ag_gui_elem* start = ag_gui_elem_new();
+	struct ag_gui_elem* start = ag_gui_elem__new();
 	start->type = AG_GUI_NONE;
 	struct ag_gui_elem* elem = start;
 	struct ag_gui_elem* new_elem;
@@ -60,7 +60,7 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 		{
 			if(strcmp(lines[i], "bg") == 0) //special case
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_NONE;
 				new_elem->parent = elem;
 				elem->bg = new_elem;
@@ -69,50 +69,50 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 			}
 			else if(strcmp(lines[i], "solid") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_SOLID;
-				ag_gui_elem_add_child(elem, new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
 			}
 			else if(strcmp(lines[i], "image") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_IMG;
-				ag_gui_elem_add_child(elem, new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
 			}
 			else if(strcmp(lines[i], "button") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_BUTTON;
-				ag_gui_elem_add_child(elem, new_elem);
-				new_elem->preferred_size = ag_gui_elem_get_preferred_size(new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
+				new_elem->preferred_size = ag_gui_elem__get_preferred_size(new_elem);
 				elem = new_elem;
 				++level;
 			}
 			else if(strcmp(lines[i], "label") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_LABEL;
-				ag_gui_elem_add_child(elem, new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
 			}
 			else if(strcmp(lines[i], "hpanel") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_HPANEL;
-				ag_gui_elem_add_child(elem, new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
 			}
 			else if(strcmp(lines[i], "vpanel") == 0)
 			{
-				new_elem = ag_gui_elem_new();
+				new_elem = ag_gui_elem__new();
 				new_elem->type = AG_GUI_VPANEL;
-				ag_gui_elem_add_child(elem, new_elem);
+				ag_gui_elem__add_child(elem, new_elem);
 				elem = new_elem;
 				++level;
 			}
@@ -199,6 +199,6 @@ struct ag_gui* ag_gui_new_from_file(char* fname)
 	gui->size = ag_vec2i(0,0);
 	gui->pos = ag_vec2i(0,0);
 	gui->focused_elem = 0;
-	ag_gui_elem_destroy(start);
+	ag_gui_elem__destroy(start);
 	return gui;
 }

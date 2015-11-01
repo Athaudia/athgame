@@ -14,10 +14,10 @@ struct age_famicom
 	uint8_t* prg_ram;
 };
 
-struct age_famicom* age_famicom_new();
-void age_famicom_destroy(struct age_famicom* fami);
+struct age_famicom* age_famicom__new();
+void age_famicom__destroy(struct age_famicom* fami);
 
 //uint8_t age_famicom_cpu_read_mem(void* sys, uint16_t pos);
 //void age_famicom_cpu_write_mem(void* sys, uint16_t pos, uint8_t val);
 
-ag_error age_famicom_load_rom(struct age_famicom* fami, char* path);
+ag_error age_famicom__load_rom(struct age_famicom* fami, char* path);

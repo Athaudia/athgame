@@ -2,7 +2,7 @@
 #include "platform.h"
 #include <math.h>
 
-void ag_surface32_filter_to(struct ag_surface32* dst, struct ag_surface32* src, enum ag_filter scaler)
+void ag_surface32__filter_to(struct ag_surface32* dst, struct ag_surface32* src, enum ag_filter scaler)
 {
 	switch(scaler)
 	{
@@ -143,12 +143,12 @@ void ag_surface32_filter_to(struct ag_surface32* dst, struct ag_surface32* src, 
 			double val = fmod(ag_get_time(),10)*36;
 			for(int y = 0; y < src->size.h; ++y)
 				for(int x = 0; x < src->size.w; ++x)
-					dst->data[x+y*dst->size.w] = ag_hue_shift(src->data[x+y*src->size.w], val);
+					dst->data[x+y*dst->size.w] = ag_color32__hue_shift(src->data[x+y*src->size.w], val);
 		}
 	}
 }
 
-double ag_filter_get_scale(enum ag_filter filter)
+double ag_filter__get_scale(enum ag_filter filter)
 {
 	switch(filter)
 	{

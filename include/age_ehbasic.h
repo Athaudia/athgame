@@ -10,6 +10,6 @@ struct age_ehbasic
 	int strpos;
 };
 
-struct age_ehbasic* age_ehbasic_new();
-void age_ehbasic_destroy(struct age_ehbasic* sys);
-ag_error age_ehbasic_load_rom(struct age_ehbasic* sys, char* path);
+struct age_ehbasic* age_ehbasic__new();
+void age_ehbasic__destroy(struct age_ehbasic* sys);
+ag_error age_ehbasic__load_rom(struct age_ehbasic* sys, char* path);

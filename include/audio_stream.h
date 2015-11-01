@@ -11,6 +11,6 @@ struct ag_audio_stream
 	struct ag_audio_region* buffers;
 };
 
-struct ag_audio_stream* ag_audio_stream_new();
+struct ag_audio_stream* ag_audio_stream__new();
 
 #endif

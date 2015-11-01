@@ -10,7 +10,7 @@ struct ag_audio_region
 	ag_audio_sample* samples;
 };
 
-struct ag_audio_region* ag_audio_region_new(int sample_count, int channel_count);
-void ag_audio_region_destroy(struct ag_audio_region* audio_region);
+struct ag_audio_region* ag_audio_region__new(int sample_count, int channel_count);
+void ag_audio_region__destroy(struct ag_audio_region* audio_region);
 
 #endif

@@ -37,7 +37,7 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)((LPCREATESTRUCT)lparam)->lpCreateParams);
 		break;
 	case WM_DESTROY:
-		ag_event_push(ag_event_close_new(window));
+		ag_event__push(ag_event__close_new(window));
 		break;
 	case WM_PAINT:
 		{
@@ -62,9 +62,9 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		}
 	case WM_SIZE:
 		window->size = ag_vec2i(LOWORD(lparam)/window->filtered_surface->scale, HIWORD(lparam)/window->filtered_surface->scale);
-		ag_window_reinit_surfaces(window);
+		ag_window__reinit_surfaces(window);
 		if(ag_state_current)
-			ag_state_run_inner(ag_state_current);
+			ag_state__run_inner(ag_state_current);
 		break;
 	case WM_INPUT:
 		{
@@ -86,13 +86,13 @@ LRESULT CALLBACK win_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_MOUSEMOVE:
 		window->mouse_pos.x = GET_X_LPARAM(lparam) / window->filtered_surface->scale;
 		window->mouse_pos.y = GET_Y_LPARAM(lparam) / window->filtered_surface->scale;
-		ag_event_push(ag_event_mouse_move_new(window, window->mouse_pos));
+		ag_event__push(ag_event__mouse_move_new(window, window->mouse_pos));
 		break;
 	case WM_LBUTTONDOWN:
-		ag_event_push(ag_event_mouse_down_new(window, window->mouse_pos));
+		ag_event__push(ag_event__mouse_down_new(window, window->mouse_pos));
 		break;
 	case WM_LBUTTONUP:
-		ag_event_push(ag_event_mouse_up_new(window, window->mouse_pos));
+		ag_event__push(ag_event__mouse_up_new(window, window->mouse_pos));
 		break;
 	default:
         return DefWindowProc(hwnd, msg, wparam, lparam);

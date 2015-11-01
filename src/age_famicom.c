@@ -20,7 +20,7 @@ struct ines_header
 };
 #pragma pack(pop)
 
-uint8_t age_famicom_cpu_read_mem(void* sys, uint16_t pos)
+uint8_t age_famicom__cpu_read_mem(void* sys, uint16_t pos)
 {
 	struct age_famicom* fami = (struct age_famicom*)sys;
 	if(pos < 0x2000) //internal ram
@@ -38,7 +38,7 @@ uint8_t age_famicom_cpu_read_mem(void* sys, uint16_t pos)
 	return 0;
 }
 
-void age_famicom_cpu_write_mem(void* sys, uint16_t pos, uint8_t val)
+void age_famicom__cpu_write_mem(void* sys, uint16_t pos, uint8_t val)
 {
 	struct age_famicom* fami = (struct age_famicom*)sys;
 	if(pos < 0x2000) //internal ram
@@ -53,7 +53,7 @@ void age_famicom_cpu_write_mem(void* sys, uint16_t pos, uint8_t val)
 	//cartridge space
 }
 
-struct age_famicom* age_famicom_new()
+struct age_famicom* age_famicom__new()
 {
 	struct age_famicom* famicom = (struct age_famicom*)malloc(sizeof(struct age_famicom));
 	famicom->work_ram    = (uint8_t*)malloc(2048);
@@ -62,11 +62,11 @@ struct age_famicom* age_famicom_new()
 	famicom->apu_reg_ram = (uint8_t*)malloc(0x20);
 	famicom->prg_rom     = 0;
 	famicom->prg_ram     = (uint8_t*)malloc(0x2000);
-	famicom->cpu = age_6502_new(famicom, age_famicom_cpu_read_mem, age_famicom_cpu_write_mem);
+	famicom->cpu = age_6502__new(famicom, age_famicom__cpu_read_mem, age_famicom__cpu_write_mem);
 	return famicom;
 }
 
-ag_error age_famicom_load_rom(struct age_famicom* fami, char* path)
+ag_error age_famicom__load_rom(struct age_famicom* fami, char* path)
 {
 	FILE* fil = fopen(path, "rb");
 	if(fil == 0)
@@ -83,13 +83,13 @@ ag_error age_famicom_load_rom(struct age_famicom* fami, char* path)
 	fread(fami->prg_rom, 1, 0x4000*header.prg_rom_size, fil);
 	if(header.prg_rom_size == 1) //if only one prg ram bank in mapper 0 used, mirror to upper bank
 		memcpy(fami->prg_rom+0x4000, fami->prg_rom, 0x4000);
-	age_6502_init(fami->cpu);
+	age_6502__init(fami->cpu);
 	return AG_ERR_SUCCESS;
 }
 
-void age_famicom_destroy(struct age_famicom* fami)
+void age_famicom__destroy(struct age_famicom* fami)
 {
-	age_6502_destroy(fami->cpu);
+	age_6502__destroy(fami->cpu);
 	free(fami->work_ram);
 	free(fami->ppu_reg_ram);
 	free(fami->apu_reg_ram);

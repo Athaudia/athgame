@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-struct ag_irc_msg* ag_irc_msg_new(char* prefix, char* command, char** parameters, int parameter_count)
+struct ag_irc_msg* ag_irc_msg__new(char* prefix, char* command, char** parameters, int parameter_count)
 {
 	struct ag_irc_msg* msg = (struct ag_irc_msg*)malloc(sizeof(struct ag_irc_msg));
 	if(prefix)
@@ -26,7 +26,7 @@ struct ag_irc_msg* ag_irc_msg_new(char* prefix, char* command, char** parameters
 	return msg;
 }
 
-struct ag_irc_msg* ag_irc_msg_new_from_string(char* cstr)
+struct ag_irc_msg* ag_irc_msg__new_from_string(char* cstr)
 {
 	struct ag_irc_msg* msg = (struct ag_irc_msg*)malloc(sizeof(struct ag_irc_msg));
 	char* str = strdup(cstr);
@@ -85,7 +85,7 @@ struct ag_irc_msg* ag_irc_msg_new_from_string(char* cstr)
 	return msg;
 }
 
-void ag_irc_msg_destroy(struct ag_irc_msg* msg)
+void ag_irc_msg__destroy(struct ag_irc_msg* msg)
 {
 	free(msg->prefix);
 	free(msg->command);
@@ -96,7 +96,7 @@ void ag_irc_msg_destroy(struct ag_irc_msg* msg)
 }
 
 
-char* ag_irc_msg_to_string(struct ag_irc_msg* msg)
+char* ag_irc_msg__to_string(struct ag_irc_msg* msg)
 {
 	char* str = (char*)malloc(sizeof(char)*513);
 	char* strp = str;
@@ -114,7 +114,7 @@ char* ag_irc_msg_to_string(struct ag_irc_msg* msg)
 	return str;
 }
 
-char* ag_irc_msg_debug_inspect(struct ag_irc_msg* msg)
+char* ag_irc_msg__debug_inspect(struct ag_irc_msg* msg)
 {
 	char* str = (char*)malloc(sizeof(char)*600);
 	char* strp = str;
@@ -134,60 +134,60 @@ char* ag_irc_msg_debug_inspect(struct ag_irc_msg* msg)
 
 //client
 
-struct ag_irc_client* ag_irc_client_new(char* server, char* port, char* nick)
+struct ag_irc_client* ag_irc_client__new(char* server, char* port, char* nick)
 {
 	struct ag_irc_client* client = (struct ag_irc_client*)malloc(sizeof(struct ag_irc_client));
 	client->last_received = 0;
-	client->con = ag_tcp_con_buffered_new(server, port, 512, "\r\n");
-	ag_irc_client_send_nick(client, nick);
-	ag_irc_client_send_user(client, nick);
+	client->con = ag_tcp_con_buffered__new(server, port, 512, "\r\n");
+	ag_irc_client__send_nick(client, nick);
+	ag_irc_client__send_user(client, nick);
 	return client;
 }
 
-void ag_irc_client_destroy(struct ag_irc_client* client)
+void ag_irc_client__destroy(struct ag_irc_client* client)
 {
-	ag_tcp_con_buffered_destroy(client->con);
+	ag_tcp_con_buffered__destroy(client->con);
 	if(client->last_received)
-		ag_irc_msg_destroy(client->last_received);
+		ag_irc_msg__destroy(client->last_received);
 	free(client);
 }
 
-void ag_irc_client_send(struct ag_irc_client* client, char* prefix, char* command, char** parameters, int parameter_count)
+void ag_irc_client__send(struct ag_irc_client* client, char* prefix, char* command, char** parameters, int parameter_count)
 {
-	struct ag_irc_msg* msg = ag_irc_msg_new(prefix, command, parameters, parameter_count);
-	char* msg_str = ag_irc_msg_to_string(msg);
-	ag_tcp_con_buffered_send_str(client->con, msg_str);
+	struct ag_irc_msg* msg = ag_irc_msg__new(prefix, command, parameters, parameter_count);
+	char* msg_str = ag_irc_msg__to_string(msg);
+	ag_tcp_con_buffered__send_str(client->con, msg_str);
 	printf(">> %s", msg_str);
 	free(msg_str);
-	ag_irc_msg_destroy(msg);
+	ag_irc_msg__destroy(msg);
 }
 
-struct ag_irc_msg* ag_irc_client_recv(struct ag_irc_client* client)
+struct ag_irc_msg* ag_irc_client__recv(struct ag_irc_client* client)
 {
 	if(client->last_received)
-		ag_irc_msg_destroy(client->last_received);
-	char* str = ag_tcp_con_buffered_recv(client->con);
+		ag_irc_msg__destroy(client->last_received);
+	char* str = ag_tcp_con_buffered__recv(client->con);
 	if(str)
 	{
 		printf("<< %s\n", str);
-		client->last_received = ag_irc_msg_new_from_string(str);
+		client->last_received = ag_irc_msg__new_from_string(str);
 	}
 	else
 		client->last_received = 0;
 	if(client->last_received && strcmp(client->last_received->command, "PING") == 0)
 	{
-		ag_irc_client_send(client, 0, "PONG", client->last_received->parameters, client->last_received->parameter_count);
+		ag_irc_client__send(client, 0, "PONG", client->last_received->parameters, client->last_received->parameter_count);
 		//client->last_received = 0;
 	}
 	return client->last_received;
 }
 
-void ag_irc_client_send_nick(struct ag_irc_client* client, char* nick)
+void ag_irc_client__send_nick(struct ag_irc_client* client, char* nick)
 {
-	ag_irc_client_send(client, 0, "NICK", (char*[]){nick}, 1);
+	ag_irc_client__send(client, 0, "NICK", (char*[]){nick}, 1);
 }
 
-void ag_irc_client_send_user(struct ag_irc_client* client, char* user)
+void ag_irc_client__send_user(struct ag_irc_client* client, char* user)
 {
-	ag_irc_client_send(client, 0, "USER", (char*[]){user, user, user, user}, 4);
+	ag_irc_client__send(client, 0, "USER", (char*[]){user, user, user, user}, 4);
 }

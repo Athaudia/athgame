@@ -2,45 +2,44 @@
 #include <math.h>
 #include <stdlib.h>
 
-void ag_surface32_fill_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
+void ag_surface32__fill_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
 {
 	for(int y = 0; y < size.h; ++y)
 		for(int x = 0; x < size.w; ++x)
 			surface->data[(x+pos.x)+(y+pos.y)*surface->size.w] = color;
 }
 
-void ag_surface32_draw_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
+void ag_surface32__draw_rect(struct ag_surface32* surface, struct ag_vec2i pos, struct ag_vec2i size, struct ag_color32 color)
 {
 	size.w--;
 	size.h--;
-	ag_surface32_draw_line(surface, pos, ag_vec2i(pos.x,pos.y+size.h), color);
-	ag_surface32_draw_line(surface, pos, ag_vec2i(pos.x+size.w,pos.y), color);
-	ag_surface32_draw_line(surface, ag_vec2i(pos.x,pos.y+size.h), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
-	ag_surface32_draw_line(surface, ag_vec2i(pos.x+size.w,pos.y), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
+	ag_surface32__draw_line(surface, pos, ag_vec2i(pos.x,pos.y+size.h), color);
+	ag_surface32__draw_line(surface, pos, ag_vec2i(pos.x+size.w,pos.y), color);
+	ag_surface32__draw_line(surface, ag_vec2i(pos.x,pos.y+size.h), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
+	ag_surface32__draw_line(surface, ag_vec2i(pos.x+size.w,pos.y), ag_vec2i(pos.x+size.w,pos.y+size.h), color);
 }
 
 
-void ag_surface32_draw_line(struct ag_surface32* surface, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
+void ag_surface32__draw_line(struct ag_surface32* surface, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
 {
 	if(start.y == end.y)
 	{
 		if(start.x < end.x)
-			ag_surface32_fill_rect(surface, start, ag_vec2i(end.x-start.x+1,1), color);
+			ag_surface32__fill_rect(surface, start, ag_vec2i(end.x-start.x+1,1), color);
 		else
-			ag_surface32_fill_rect(surface, end, ag_vec2i(start.x-end.x+1,1), color);
+			ag_surface32__fill_rect(surface, end, ag_vec2i(start.x-end.x+1,1), color);
 		return;
 	}
 
 	if(start.x == end.x)
 	{
 		if(start.y < end.y)
-			ag_surface32_fill_rect(surface, start, ag_vec2i(1,end.y-start.y+1), color);
+			ag_surface32__fill_rect(surface, start, ag_vec2i(1,end.y-start.y+1), color);
 		else
-			ag_surface32_fill_rect(surface, end, ag_vec2i(1,start.y-end.y+1), color);
+			ag_surface32__fill_rect(surface, end, ag_vec2i(1,start.y-end.y+1), color);
 		return;
 	}
 
-	//todo: optimize for horizontal and vertical lines
 	int dx = abs(end.x - start.x);
 	int dy = abs(end.y - start.y);
 	int sx = start.x < end.x ? 1 : -1;
@@ -102,7 +101,7 @@ inline void _dla_plot(struct ag_surface32* img, int x, int y, struct ag_color32*
  
 #define swap_(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
 
-void ag_surface32_draw_line_aa(struct ag_surface32* img, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
+void ag_surface32__draw_line_aa(struct ag_surface32* img, struct ag_vec2i start, struct ag_vec2i end, struct ag_color32 color)
 {
 	int x1 = start.x, x2 = end.x, y1 = start.y, y2 = end.y;
   double dx = (double)x2 - (double)x1;

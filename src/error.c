@@ -1,6 +1,6 @@
 #include "error.h"
 
-char* ag_error_readable(ag_error error)
+char* ag_error__readable(ag_error error)
 {
 	switch(error)
 	{

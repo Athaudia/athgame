@@ -46,18 +46,18 @@ struct ag_gui
 	struct ag_gui_elem* focused_elem;
 };
 
-struct ag_gui_elem* ag_gui_elem_new();
-void ag_gui_elem_destroy(struct ag_gui_elem* elem);
-void ag_gui_elem_destroy_recursive(struct ag_gui_elem* elem); //todo: implement
-void ag_gui_elem_add_child(struct ag_gui_elem* elem, struct ag_gui_elem* child);
-void ag_gui_elem_debug(struct ag_gui_elem* elem);
-char* ag_gui_elem_type_to_string(enum ag_gui_elem_type type);
-void ag_gui_elem_manage_layout(struct ag_gui_elem* elem);
-struct ag_vec2i ag_gui_elem_get_absolute_pos(struct ag_gui_elem* elem);
-struct ag_vec2i ag_gui_elem_get_preferred_size(struct ag_gui_elem* elem);
+struct ag_gui_elem* ag_gui_elem__new();
+void ag_gui_elem__destroy(struct ag_gui_elem* elem);
+void ag_gui_elem__destroy_recursive(struct ag_gui_elem* elem); //todo: implement
+void ag_gui_elem__add_child(struct ag_gui_elem* elem, struct ag_gui_elem* child);
+void ag_gui_elem__debug(struct ag_gui_elem* elem);
+char* ag_gui_elem_type__to_string(enum ag_gui_elem_type type);
+void ag_gui_elem__manage_layout(struct ag_gui_elem* elem);
+struct ag_vec2i ag_gui_elem__get_absolute_pos(struct ag_gui_elem* elem);
+struct ag_vec2i ag_gui_elem__get_preferred_size(struct ag_gui_elem* elem);
 
-void ag_surface32_draw_gui(struct ag_surface32* surface, struct ag_gui* gui);
-void ag_gui_manage_layout(struct ag_gui* gui);
-struct ag_gui* ag_gui_new_from_file(char* fname);
-void ag_gui_process_event(struct ag_gui* gui, struct ag_event* event);
+void ag_surface32__draw_gui(struct ag_surface32* surface, struct ag_gui* gui);
+void ag_gui__manage_layout(struct ag_gui* gui);
+struct ag_gui* ag__gui_new_from_file(char* fname);
+void ag_gui__process_event(struct ag_gui* gui, struct ag_event* event);
 #endif

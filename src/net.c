@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-struct ag_tcp_con* ag_tcp_con_new(char* addr, char* port)
+struct ag_tcp_con* ag_tcp_con__new(char* addr, char* port)
 {
 	struct addrinfo hints;
 	struct addrinfo* res;
@@ -39,7 +39,7 @@ struct ag_tcp_con* ag_tcp_con_new(char* addr, char* port)
 	return con;
 }
 
-void ag_tcp_con_destroy(struct ag_tcp_con* con)
+void ag_tcp_con__destroy(struct ag_tcp_con* con)
 {
 #ifdef PLATFORM_WIN32
 	closesocket(con->sock);
@@ -49,19 +49,19 @@ void ag_tcp_con_destroy(struct ag_tcp_con* con)
 	free(con);
 }
 
-void ag_tcp_con_send(struct ag_tcp_con* con, void* data, int len)
+void ag_tcp_con__send(struct ag_tcp_con* con, void* data, int len)
 {
 	int sent = send(con->sock, data, len, 0);
 	if(sent < len)
 		printf("error, sent less than planned!\n");
 }
 
-void ag_tcp_con_send_str(struct ag_tcp_con* con, char* str)
+void ag_tcp_con__send_str(struct ag_tcp_con* con, char* str)
 {
-	ag_tcp_con_send(con, str, strlen(str));
+	ag_tcp_con__send(con, str, strlen(str));
 }
 
-int ag_tcp_con_recv(struct ag_tcp_con* con, void* buf, int buf_len)
+int ag_tcp_con__recv(struct ag_tcp_con* con, void* buf, int buf_len)
 {
 	int num = recv(con->sock, buf, buf_len, 0);
 	if(num == -1)
@@ -69,10 +69,10 @@ int ag_tcp_con_recv(struct ag_tcp_con* con, void* buf, int buf_len)
 	return num;
 }
 
-struct ag_tcp_con_buffered* ag_tcp_con_buffered_new(char* addr, char* port, int buffer_size, char* delim)
+struct ag_tcp_con_buffered* ag_tcp_con_buffered__new(char* addr, char* port, int buffer_size, char* delim)
 {
 	struct ag_tcp_con_buffered* con = (struct ag_tcp_con_buffered*)malloc(sizeof(struct ag_tcp_con_buffered));
-	con->con = ag_tcp_con_new(addr, port);
+	con->con = ag_tcp_con__new(addr, port);
 	con->delim = strdup(delim);
 	con->buffer_size = buffer_size;
 	con->buffer = (char*)malloc(buffer_size+1);
@@ -82,21 +82,21 @@ struct ag_tcp_con_buffered* ag_tcp_con_buffered_new(char* addr, char* port, int 
 	return con;
 }
 
-void ag_tcp_con_buffered_destroy(struct ag_tcp_con_buffered* con)
+void ag_tcp_con_buffered__destroy(struct ag_tcp_con_buffered* con)
 {
-	ag_tcp_con_destroy(con->con);
+	ag_tcp_con__destroy(con->con);
 	free(con->buffer);
 	free(con->return_line);
 	free(con);
 }
 
-char* ag_tcp_con_buffered_recv(struct ag_tcp_con_buffered* con)
+char* ag_tcp_con_buffered__recv(struct ag_tcp_con_buffered* con)
 {
 	free(con->return_line);
 	con->return_line = 0;
 
 	if(con->buffer_i < con->buffer_size)
-		con->buffer_i += ag_tcp_con_recv(con->con, con->buffer+con->buffer_i, con->buffer_size-con->buffer_i);
+		con->buffer_i += ag_tcp_con__recv(con->con, con->buffer+con->buffer_i, con->buffer_size-con->buffer_i);
 	con->buffer[con->buffer_i] = 0;
 	//printf(con->buffer);
 	char* sstr = strstr(con->buffer, con->delim);
@@ -111,7 +111,7 @@ char* ag_tcp_con_buffered_recv(struct ag_tcp_con_buffered* con)
 	return con->return_line;
 }
                             
-void ag_tcp_con_buffered_send_str(struct ag_tcp_con_buffered* con, char* str)
+void ag_tcp_con_buffered__send_str(struct ag_tcp_con_buffered* con, char* str)
 {
-	ag_tcp_con_send_str(con->con, str);
+	ag_tcp_con__send_str(con->con, str);
 }

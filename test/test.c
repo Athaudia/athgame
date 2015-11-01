@@ -164,16 +164,16 @@ int main()
 	//struct ag_tcp_con_buffered* con = ag_tcp_con_buffered_new("google.com", "80", 512, "\r\n");
 	//struct ag_irc_msg* msg = ag_irc_msg_new_from_string("command a b :a u i");
 
-	struct ag_irc_client* client = ag_irc_client_new("irc.esper.net", "6667", "athbot");
+	struct ag_irc_client* client = ag_irc_client__new("irc.esper.net", "6667", "athbot");
 
 	while(true)
 	{
-		struct ag_irc_msg* msg = ag_irc_client_recv(client);
+		struct ag_irc_msg* msg = ag_irc_client__recv(client);
 		if(msg)
-			printf("%s\n", ag_irc_msg_debug_inspect(msg));
+			printf("%s\n", ag_irc_msg__debug_inspect(msg));
 		else
 			ag_sleep(10);
 	}
-	ag_irc_client_destroy(client);
+	ag_irc_client__destroy(client);
 	return 0;
 }

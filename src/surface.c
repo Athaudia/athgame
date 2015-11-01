@@ -11,7 +11,7 @@ struct ag_color32 ag_color32(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	return (struct ag_color32){.r=r, .g=g, .b=b, .a=a};
 }
 
-bool ag_color32_is_equal(struct ag_color32 a, struct ag_color32 b)
+bool ag_color32__is_equal(struct ag_color32 a, struct ag_color32 b)
 {
 	return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
@@ -36,10 +36,10 @@ uint32_t ag_swap_endian_uint32(uint32_t val)
  * @param size Size of the new surface.
  * @return The new surface.
  */
-struct ag_surface32* ag_surface32_new(struct ag_vec2i size)
+struct ag_surface32* ag_surface32__new(struct ag_vec2i size)
 {
 	struct ag_surface32* surface = (struct ag_surface32*)malloc(sizeof(struct ag_surface32));
-	surface->data = (struct ag_color32*)malloc(sizeof(struct ag_color32) * ag_vec2i_prod(size));
+	surface->data = (struct ag_color32*)malloc(sizeof(struct ag_color32) * ag_vec2i__prod(size));
 	surface->size = size;
 	return surface;
 }
@@ -75,7 +75,7 @@ struct bmp_header
  * @param fname Name of the file.
  * @return The new surface.
  */
-struct ag_surface32* ag_surface32_new_from_file(char* fname)
+struct ag_surface32* ag_surface32__new_from_file(char* fname)
 {
 	//todo: check extension, and handle different formats, bmp only for now
 	//todo: error handling
@@ -97,7 +97,7 @@ struct ag_surface32* ag_surface32_new_from_file(char* fname)
 	fseek(fil, header.pixel_data_offset, SEEK_SET);
 	fread(data, 1, rowsize*header.height, fil);
 	fclose(fil);
-	struct ag_surface32* surface = ag_surface32_new(ag_vec2i(header.width, header.height));
+	struct ag_surface32* surface = ag_surface32__new(ag_vec2i(header.width, header.height));
 	for(int y = 0; y < header.height; ++y)
 		for(int x = 0; x < header.width; ++x)
 		{
@@ -110,7 +110,7 @@ struct ag_surface32* ag_surface32_new_from_file(char* fname)
 	return surface;
 }
 
-struct ag_surface32* ag_surface32_new_from_file_with_color_key(char* fname, struct ag_color32 color_key)
+struct ag_surface32* ag_surface32__new_from_file_with_color_key(char* fname, struct ag_color32 color_key)
 {
 	//todo: check extension, and handle different formats, bmp only for now
 	//todo: error handling
@@ -132,12 +132,12 @@ struct ag_surface32* ag_surface32_new_from_file_with_color_key(char* fname, stru
 	fseek(fil, header.pixel_data_offset, SEEK_SET);
 	fread(data, 1, rowsize*header.height, fil);
 	fclose(fil);
-	struct ag_surface32* surface = ag_surface32_new(ag_vec2i(header.width, header.height));
+	struct ag_surface32* surface = ag_surface32__new(ag_vec2i(header.width, header.height));
 	for(int y = 0; y < header.height; ++y)
 		for(int x = 0; x < header.width; ++x)
 		{
 			struct ag_color32 col = ag_color32(data[x*3+y*rowsize+2], data[x*3+y*rowsize+1], data[x*3+y*rowsize], 255);
-			if(ag_color32_is_equal(col, color_key))
+			if(ag_color32__is_equal(col, color_key))
 				surface->data[x+(surface->size.h-y-1)*surface->size.w] = ag_color32(0,0,0,0);
 			else
 				surface->data[x+(surface->size.h-y-1)*surface->size.w] = col;
@@ -152,7 +152,7 @@ struct ag_surface32* ag_surface32_new_from_file_with_color_key(char* fname, stru
  * \memberof ag_surface32
  * @param surface The surface to destroy.
  */
-void ag_surface32_destroy(struct ag_surface32* surface)
+void ag_surface32__destroy(struct ag_surface32* surface)
 {
 	free(surface->data);
 	free(surface);
@@ -164,11 +164,11 @@ void ag_surface32_destroy(struct ag_surface32* surface)
  * @param surface The surface to clear.
  * @param color The color that the surface will be after the operation.
  */
-void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
+void ag_surface32__clear(struct ag_surface32* surface, struct ag_color32 color)
 {
 	struct ag_color32* data = surface->data;
-	if(ag_vec2i_prod(surface->size) % 16 == 0)
-		for(int i = 0; i < ag_vec2i_prod(surface->size)/16; ++i)
+	if(ag_vec2i__prod(surface->size) % 16 == 0)
+		for(int i = 0; i < ag_vec2i__prod(surface->size)/16; ++i)
 		{
 			*(data++) = color; *(data++) = color;
 			*(data++) = color; *(data++) = color;
@@ -180,7 +180,7 @@ void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
 			*(data++) = color; *(data++) = color;
 		}
 	else
-		for(int i = 0; i < ag_vec2i_prod(surface->size); ++i)
+		for(int i = 0; i < ag_vec2i__prod(surface->size); ++i)
 			*(data++) = color;
 }
 
@@ -191,9 +191,9 @@ void ag_surface32_clear(struct ag_surface32* surface, struct ag_color32 color)
  * @param src The surface that will be drawn onto the target surface.
  * @param dst_pos The position on the target surface.
  */
-void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos)
+void ag_surface32__blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos)
 {
-	ag_surface32_blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
+	ag_surface32__blit_partial_to(dst, src, dst_pos, ag_vec2i(0,0), src->size);
 }
 
 /**
@@ -205,7 +205,7 @@ void ag_surface32_blit_to(struct ag_surface32* dst, struct ag_surface32* src, st
  * @param src_pos The position of the sub rectangle on the source surface.
  * @param src_size The size of the sub rectangle on the source surface.
  */
-void ag_surface32_blit_partial_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
+void ag_surface32__blit_partial_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size)
 {
 	if(src_size.x > src->size.x - src_pos.x)
 		src_size.x = src->size.x - src_pos.x;
@@ -224,7 +224,7 @@ void ag_surface32_blit_partial_to(struct ag_surface32* dst, struct ag_surface32*
  * @param clip_pos The position of the clipping rectangle on the target surface.
  * @param clip_size The size of the clipping rectangle on the target surface.
  */
-void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
+void ag_surface32__blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size)
 {
 	struct ag_vec2i src_pos = ag_vec2i(0,0);
 	struct ag_vec2i src_size = src->size;
@@ -251,7 +251,7 @@ void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32*
 	if(src_size.y > clip_size.y)
 		src_size.y = clip_size.y;
 	if(src_size.x > 0 && src_size.y > 0)
-		ag_surface32_blit_partial_to(dst, src, dst_pos, src_pos, src_size);
+		ag_surface32__blit_partial_to(dst, src, dst_pos, src_pos, src_size);
 }
 
 /**
@@ -262,7 +262,7 @@ void ag_surface32_blit_clipped_to(struct ag_surface32* dst, struct ag_surface32*
  * @param dst_pos The position on the target surface.
  * @param color The color to draw.
  */
-void ag_surface32_blit_with_alphachan_as_color_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color)
+void ag_surface32__blit_with_alphachan_as_color_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color)
 {
 	for(int y = 0; y < src->size.h; ++y)
 		for(int x = 0; x < src->size.w; ++x)
@@ -281,7 +281,7 @@ void ag_surface32_blit_with_alphachan_as_color_to(struct ag_surface32* dst, stru
  * @param input The surface that is going to be filtered.
  * @return The new filtered surface.
  */
-struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* input)
+struct ag_filtered_surface32* ag_filtered_surface32__new(struct ag_surface32* input)
 {
 	struct ag_filtered_surface32* surface = (struct ag_filtered_surface32*)malloc(sizeof(struct ag_filtered_surface32));
 	surface->input = input;
@@ -299,10 +299,10 @@ struct ag_filtered_surface32* ag_filtered_surface32_new(struct ag_surface32* inp
  * \memberof filtered_surface32
  * @param surface The filtered surface to destroy.
  */
-void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface)
+void ag_filtered_surface32__destroy(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
-		ag_surface32_destroy(surface->filter_surfaces[i+1]); //1st is input, array is one larger than count
+		ag_surface32__destroy(surface->filter_surfaces[i+1]); //1st is input, array is one larger than count
 	free(surface->filters);
 	free(surface->filter_surfaces);
 	free(surface);
@@ -314,16 +314,16 @@ void ag_filtered_surface32_destroy(struct ag_filtered_surface32* surface)
  * @param surface The surface which to add the filter to.
  * @param filter The filter to add.
  */
-void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_filter filter)
+void ag_filtered_surface32__push(struct ag_filtered_surface32* surface, enum ag_filter filter)
 {
 	++surface->filter_count;
 	surface->filters = (enum ag_filter*)realloc(surface->filters, sizeof(enum ag_filter*)*surface->filter_count);
 	surface->filter_surfaces = (struct ag_surface32**)realloc(surface->filter_surfaces, sizeof(struct ag_surface32*)*(1+surface->filter_count));
 	surface->filters[surface->filter_count-1] = filter;
-	double new_mult = ag_filter_get_scale(filter);
+	double new_mult = ag_filter__get_scale(filter);
 	struct ag_surface32* old = surface->filter_surfaces[surface->filter_count-1];
 	//surface->filter_surfaces[surface->filter_count] = ag_surface32_new(ag_vec2i_mult(old->size, new_mult));
-	surface->filter_surfaces[surface->filter_count] = ag_surface32_new(ag_vec2i(old->size.x*new_mult, old->size.y*new_mult));
+	surface->filter_surfaces[surface->filter_count] = ag_surface32__new(ag_vec2i(old->size.x*new_mult, old->size.y*new_mult));
 	surface->scale *= new_mult;
 	surface->output = surface->filter_surfaces[surface->filter_count];
 }
@@ -333,10 +333,10 @@ void ag_filtered_surface32_push(struct ag_filtered_surface32* surface, enum ag_f
  * \memberof filtered_surface32
  * @param surface The surface to update.
  */
-void ag_filtered_surface32_update(struct ag_filtered_surface32* surface)
+void ag_filtered_surface32__update(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
-		ag_surface32_filter_to(surface->filter_surfaces[i+1], surface->filter_surfaces[i], surface->filters[i]);
+		ag_surface32__filter_to(surface->filter_surfaces[i+1], surface->filter_surfaces[i], surface->filters[i]);
 }
 
 /**
@@ -346,18 +346,18 @@ void ag_filtered_surface32_update(struct ag_filtered_surface32* surface)
  * @param input         The new input surface.
  * @param destroy_input Call ag_surface32_destroy on the old input surface?
  */
-void ag_filtered_surface32_replace_input(struct ag_filtered_surface32* surface, struct ag_surface32* input, bool destroy_input)
+void ag_filtered_surface32__replace_input(struct ag_filtered_surface32* surface, struct ag_surface32* input, bool destroy_input)
 {
 	if(destroy_input)
-		ag_surface32_destroy(surface->filter_surfaces[0]);
+		ag_surface32__destroy(surface->filter_surfaces[0]);
 	for(int i = 1; i < surface->filter_count+1; ++i)
-		ag_surface32_destroy(surface->filter_surfaces[i]);
+		ag_surface32__destroy(surface->filter_surfaces[i]);
 	surface->input = input;
 	surface->filter_surfaces[0] = input;
 	for(int i = 0; i < surface->filter_count; ++i)
 	{
-		double new_mult = ag_filter_get_scale(surface->filters[i]);
-		surface->filter_surfaces[i+1] = ag_surface32_new(ag_vec2i(surface->filter_surfaces[i]->size.x*new_mult, surface->filter_surfaces[i]->size.y*new_mult));
+		double new_mult = ag_filter__get_scale(surface->filters[i]);
+		surface->filter_surfaces[i+1] = ag_surface32__new(ag_vec2i(surface->filter_surfaces[i]->size.x*new_mult, surface->filter_surfaces[i]->size.y*new_mult));
 	}
 	surface->output = surface->filter_surfaces[surface->filter_count];
 }
@@ -366,10 +366,10 @@ void ag_filtered_surface32_replace_input(struct ag_filtered_surface32* surface, 
  * Removes all filters, making the filtered surface a 1:1 representation
  * @param surface The Filtered surface
  */
-void ag_filtered_surface32_reset(struct ag_filtered_surface32* surface)
+void ag_filtered_surface32__reset(struct ag_filtered_surface32* surface)
 {
 	for(int i = 0; i < surface->filter_count; ++i)
-		ag_surface32_destroy(surface->filter_surfaces[i+1]);
+		ag_surface32__destroy(surface->filter_surfaces[i+1]);
 	surface->filter_count = 0;
 	surface->filters = (enum ag_filter*)realloc(surface->filters, sizeof(enum ag_filter*)*surface->filter_count);
 	surface->filter_surfaces = (struct ag_surface32**)realloc(surface->filter_surfaces, sizeof(struct ag_surface32*)*(1+surface->filter_count));
@@ -469,7 +469,7 @@ void ag_hsv_to_rgb( float *r, float *g, float *b, float h, float s, float v )
 /**
  * \private
  */
-struct ag_color32 ag_hue_shift(struct ag_color32 color, float hue)
+struct ag_color32 ag_color32__hue_shift(struct ag_color32 color, float hue)
 {
 	if(hue == 0.f)
 		return color;

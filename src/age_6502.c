@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct age_6502* age_6502_new(void* system, uint8_t (*read_mem)(void* sys, uint16_t pos), void (*write_mem)(void* sys, uint16_t pos, uint8_t data))
+struct age_6502* age_6502__new(void* system, uint8_t (*read_mem)(void* sys, uint16_t pos), void (*write_mem)(void* sys, uint16_t pos, uint8_t data))
 {
 	struct age_6502* cpu = (struct age_6502*)malloc(sizeof(struct age_6502));
 	cpu->system = system;
@@ -11,29 +11,29 @@ struct age_6502* age_6502_new(void* system, uint8_t (*read_mem)(void* sys, uint1
 	return cpu;
 }
 
-void age_6502_destroy(struct age_6502* cpu)
+void age_6502__destroy(struct age_6502* cpu)
 {
 	free(cpu);
 }
 
-void age_6502_init(struct age_6502* cpu)
+void age_6502__init(struct age_6502* cpu)
 {
 	cpu->cycle = 0;
 	cpu->sp = 0xff;
 	cpu->pc = cpu->read_mem(cpu->system, 0xfffc) | ((uint16_t)cpu->read_mem(cpu->system, 0xfffd) << 8);
 }
 
-uint16_t age_6502_read16(struct age_6502* cpu, uint16_t addr)
+uint16_t age_6502__read16(struct age_6502* cpu, uint16_t addr)
 {
 	return cpu->read_mem(cpu->system, addr) | ((uint16_t)cpu->read_mem(cpu->system, addr+1) << 8);
 }
 
-uint8_t age_6502_get_p(struct age_6502* cpu)
+uint8_t age_6502__get_p(struct age_6502* cpu)
 {
 	return (cpu->f_c) | (cpu->f_z << 1) | (cpu->f_i << 2) | (cpu->f_d << 3) | (cpu->f_b << 4) | (1 << 5) | (cpu->f_v << 6) | (cpu->f_n << 7);
 }
 
-void age_6502_set_p(struct age_6502* cpu, uint8_t val)
+void age_6502__set_p(struct age_6502* cpu, uint8_t val)
 {
 	cpu->f_c = (val & 0x01);
 	cpu->f_z = (val & 0x02) >> 1;
@@ -50,17 +50,17 @@ void age_6502_set_p(struct age_6502* cpu, uint8_t val)
 #define D_ZPX  printf(" $%02X,X\n", cpu->read_mem(cpu->system, cpu->pc+1));
 #define D_ZPY  printf(" $%02X,Y\n", cpu->read_mem(cpu->system, cpu->pc+1));
 #define D_REL  printf(" $%04X\n", (int8_t)cpu->read_mem(cpu->system, cpu->pc+1)+(int)cpu->pc+2);
-#define D_ABS  printf(" $%04X\n", age_6502_read16(cpu, cpu->pc+1));
-#define D_ABSX printf(" $%04X,X\n", age_6502_read16(cpu, cpu->pc+1));
-#define D_ABSY printf(" $%04X,Y\n", age_6502_read16(cpu, cpu->pc+1));
+#define D_ABS  printf(" $%04X\n", age_6502__read16(cpu, cpu->pc+1));
+#define D_ABSX printf(" $%04X,X\n", age_6502__read16(cpu, cpu->pc+1));
+#define D_ABSY printf(" $%04X,Y\n", age_6502__read16(cpu, cpu->pc+1));
 #define D_INDX printf(" ($%02X,X)\n", cpu->read_mem(cpu->system, cpu->pc+1));
 #define D_INDY printf(" ($%02X),Y\n", cpu->read_mem(cpu->system, cpu->pc+1));
-void age_6502_print_next_instruction(struct age_6502* cpu)
+void age_6502__print_next_instruction(struct age_6502* cpu)
 {
 	printf("%04x:", cpu->pc);
 	for(int i = 0; i < 4; ++i)
 		printf("%02x:", cpu->read_mem(cpu->system, cpu->pc+i));
-	printf("a=%02x:x=%02x:y=%02x:sp=%02x:p=%02x:  ", cpu->a, cpu->x, cpu->y, cpu->sp, age_6502_get_p(cpu));
+	printf("a=%02x:x=%02x:y=%02x:sp=%02x:p=%02x:  ", cpu->a, cpu->x, cpu->y, cpu->sp, age_6502__get_p(cpu));
 	switch(cpu->read_mem(cpu->system, cpu->pc))
 	{
 	case 0x69: printf("ADC"); D_IMM  break;
@@ -151,7 +151,7 @@ void age_6502_print_next_instruction(struct age_6502* cpu)
 	case 0xC8: printf("INY\n");      break;
 
 	case 0x4C: printf("JMP"); D_ABS  break;
-	case 0x6C: printf("JMP ($%04x)\n", age_6502_read16(cpu, cpu->pc+1)); break;
+	case 0x6C: printf("JMP ($%04x)\n", age_6502__read16(cpu, cpu->pc+1)); break;
 
 	case 0x20: printf("JSR"); D_ABS  break;
 
@@ -260,7 +260,7 @@ void age_6502_print_next_instruction(struct age_6502* cpu)
 	}	
 }
 
-void age_6502_print_page(struct age_6502* cpu, uint16_t page)
+void age_6502__print_page(struct age_6502* cpu, uint16_t page)
 {
 	for(int l = 0; l < 4; ++l)
 	{
@@ -272,35 +272,35 @@ void age_6502_print_page(struct age_6502* cpu, uint16_t page)
 	}
 }
 
-uint8_t age_6502_fetch_next(struct age_6502* cpu)
+uint8_t age_6502__fetch_next(struct age_6502* cpu)
 {
 	return cpu->read_mem(cpu->system, cpu->pc++);
 }
 
 
-uint16_t age_6502_fetch_next16(struct age_6502* cpu)
+uint16_t age_6502__fetch_next16(struct age_6502* cpu)
 {
 	cpu->pc += 2;
-	return age_6502_read16(cpu, cpu->pc-2);
+	return age_6502__read16(cpu, cpu->pc-2);
 }
 
-void age_6502_stack_push(struct age_6502* cpu, uint8_t val)
+void age_6502__stack_push(struct age_6502* cpu, uint8_t val)
 {
 	cpu->write_mem(cpu->system, cpu->sp-- + 0x100, val);
 }
 
-void age_6502_stack_push16(struct age_6502* cpu, uint16_t val)
+void age_6502__stack_push16(struct age_6502* cpu, uint16_t val)
 {
 	cpu->write_mem(cpu->system, cpu->sp-- + 0x100, val>>8);
 	cpu->write_mem(cpu->system, cpu->sp-- + 0x100, val&0xFF);
 }
 
-uint8_t age_6502_stack_pop(struct age_6502* cpu)
+uint8_t age_6502__stack_pop(struct age_6502* cpu)
 {
 	return cpu->read_mem(cpu->system, ++cpu->sp);
 }
 
-uint16_t age_6502_stack_pop16(struct age_6502* cpu)
+uint16_t age_6502__stack_pop16(struct age_6502* cpu)
 {
 	cpu->sp += 2;
 	return cpu->read_mem(cpu->system, cpu->sp-1+0x100) | ((uint16_t)cpu->read_mem(cpu->system, cpu->sp-0+0x100) << 8);
@@ -312,39 +312,39 @@ uint16_t age_6502_stack_pop16(struct age_6502* cpu)
 #define SET_Z cpu->f_z = res8 == 0
 #define SET_C cpu->f_c = res > 0xff
 
-#define IMM    cpu->cycle += 2; val = age_6502_fetch_next(cpu);
-#define ZP     cpu->cycle += 3; addr = age_6502_fetch_next(cpu); val = cpu->read_mem(cpu->system, addr);
-#define ZPX    cpu->cycle += 4; addr = (age_6502_fetch_next(cpu)+cpu->x)&0xFF; val = cpu->read_mem(cpu->system, addr);
-#define ZPY    cpu->cycle += 4; addr = (age_6502_fetch_next(cpu)+cpu->y)&0xFF; val = cpu->read_mem(cpu->system, addr);
-#define ABS    cpu->cycle += 4; addr = age_6502_fetch_next16(cpu); val = cpu->read_mem(cpu->system, addr);
-#define ABSX   cpu->cycle += 5; addr = age_6502_fetch_next16(cpu)+cpu->x; val = cpu->read_mem(cpu->system, addr);
-#define ABSY   cpu->cycle += 5; addr = age_6502_fetch_next16(cpu)+cpu->y; val = cpu->read_mem(cpu->system, addr);
-#define ABSX_B taddr = age_6502_fetch_next16(cpu);	  \
+#define IMM    cpu->cycle += 2; val = age_6502__fetch_next(cpu);
+#define ZP     cpu->cycle += 3; addr = age_6502__fetch_next(cpu); val = cpu->read_mem(cpu->system, addr);
+#define ZPX    cpu->cycle += 4; addr = (age_6502__fetch_next(cpu)+cpu->x)&0xFF; val = cpu->read_mem(cpu->system, addr);
+#define ZPY    cpu->cycle += 4; addr = (age_6502__fetch_next(cpu)+cpu->y)&0xFF; val = cpu->read_mem(cpu->system, addr);
+#define ABS    cpu->cycle += 4; addr = age_6502__fetch_next16(cpu); val = cpu->read_mem(cpu->system, addr);
+#define ABSX   cpu->cycle += 5; addr = age_6502__fetch_next16(cpu)+cpu->x; val = cpu->read_mem(cpu->system, addr);
+#define ABSY   cpu->cycle += 5; addr = age_6502__fetch_next16(cpu)+cpu->y; val = cpu->read_mem(cpu->system, addr);
+#define ABSX_B taddr = age_6502__fetch_next16(cpu);	  \
 	addr = taddr + cpu->x; \
 	cpu->cycle += 4 + (((taddr%0x100)+cpu->x) >> 8); /*grab lower byte of address, add register, then check if byte overflows*/ \
 	val = cpu->read_mem(cpu->system, addr);
 
-#define ABSY_B taddr = age_6502_fetch_next16(cpu);	  \
+#define ABSY_B taddr = age_6502__fetch_next16(cpu);	  \
 	addr = taddr + cpu->y; \
 	cpu->cycle += 4 + (((taddr%0x100)+cpu->y) >> 8); \
 	val = cpu->read_mem(cpu->system, addr);
 
 //todo: zero page wraparound?
-#define INDX   cpu->cycle += 6; addr = age_6502_read16(cpu, age_6502_fetch_next(cpu)+cpu->x); val = cpu->read_mem(cpu->system, addr);
-#define INDY   cpu->cycle += 6; addr = age_6502_read16(cpu, age_6502_fetch_next(cpu))+cpu->y; val = cpu->read_mem(cpu->system, addr);
-#define INDY_B taddr = age_6502_read16(cpu, age_6502_fetch_next(cpu));  \
+#define INDX   cpu->cycle += 6; addr = age_6502__read16(cpu, age_6502__fetch_next(cpu)+cpu->x); val = cpu->read_mem(cpu->system, addr);
+#define INDY   cpu->cycle += 6; addr = age_6502__read16(cpu, age_6502__fetch_next(cpu))+cpu->y; val = cpu->read_mem(cpu->system, addr);
+#define INDY_B taddr = age_6502__read16(cpu, age_6502__fetch_next(cpu));  \
 	addr = taddr + cpu->y; \
 	cpu->cycle += 5 + (((taddr%0x100)+cpu->y) >> 8); \
 	val = cpu->read_mem(cpu->system, addr);
 
-#define BRANCH(A) if(A){res=(int8_t)age_6502_fetch_next(cpu) + cpu->pc; cpu->cycle += 3 + ((res>>8) != (cpu->pc>>8)); cpu->pc = res;} else {cpu->cycle += 2; cpu->pc++;}
+#define BRANCH(A) if(A){res=(int8_t)age_6502__fetch_next(cpu) + cpu->pc; cpu->cycle += 3 + ((res>>8) != (cpu->pc>>8)); cpu->pc = res;} else {cpu->cycle += 2; cpu->pc++;}
 
-void age_6502_exec(struct age_6502* cpu)
+void age_6502__exec(struct age_6502* cpu)
 {
 	uint8_t val, res8;
 	uint16_t res, taddr, addr;
 	int16_t ress;
-	switch(age_6502_fetch_next(cpu))
+	switch(age_6502__fetch_next(cpu))
 	{
 		//ADC
 	case 0x69: IMM    goto adc;
@@ -428,9 +428,9 @@ void age_6502_exec(struct age_6502* cpu)
 		//BRK
 	case 0x00:
 		cpu->cycle += 7;
-		age_6502_stack_push16(cpu, cpu->pc);
-		age_6502_stack_push(cpu, age_6502_get_p(cpu));
-		cpu->pc = age_6502_read16(cpu, 0xFFFE);
+		age_6502__stack_push16(cpu, cpu->pc);
+		age_6502__stack_push(cpu, age_6502__get_p(cpu));
+		cpu->pc = age_6502__read16(cpu, 0xFFFE);
 		cpu->f_b = 1;
 		break;
 
@@ -563,11 +563,11 @@ void age_6502_exec(struct age_6502* cpu)
 		//JMP
 	case 0x4C: //absolute
 		cpu->cycle += 3;
-		cpu->pc = age_6502_fetch_next16(cpu);
+		cpu->pc = age_6502__fetch_next16(cpu);
 		break;
 	case 0x6C: //indirect
 		cpu->cycle += 5;
-		addr = age_6502_fetch_next16(cpu);
+		addr = age_6502__fetch_next16(cpu);
 		//bug in 6502, if address crosses page boundary, read from beginning of first page, instead of second page (todo: diverge on other variations)
 		cpu->pc = cpu->read_mem(cpu->system, addr) | (cpu->read_mem(cpu->system, (addr&0xFF00)|(((addr&0xFF)+1)%0x100)) << 8);
 		break;
@@ -575,8 +575,8 @@ void age_6502_exec(struct age_6502* cpu)
 		//JSR
 	case 0x20:
 		cpu->cycle += 6;
-		addr = age_6502_fetch_next16(cpu);
-		age_6502_stack_push16(cpu, cpu->pc - 1);
+		addr = age_6502__fetch_next16(cpu);
+		age_6502__stack_push16(cpu, cpu->pc - 1);
 		cpu->pc = addr;
 		break;
 
@@ -661,26 +661,26 @@ void age_6502_exec(struct age_6502* cpu)
 		//PHA
 	case 0x48:
 		cpu->cycle += 3;
-		age_6502_stack_push(cpu, cpu->a);
+		age_6502__stack_push(cpu, cpu->a);
 		break;
 
 		//PHP
 	case 0x08:
 		cpu->cycle += 3;
-		age_6502_stack_push(cpu, age_6502_get_p(cpu));
+		age_6502__stack_push(cpu, age_6502__get_p(cpu));
 		break;
 
 		//PLA
 	case 0x68:
 		cpu->cycle += 4;
-		cpu->a = age_6502_stack_pop(cpu);
+		cpu->a = age_6502__stack_pop(cpu);
 		cpu->f_z = cpu->a == 0;
 		cpu->f_n = cpu->a >> 7;
 		break;
 
 		//PLP
 	case 0x28:
-		age_6502_set_p(cpu, age_6502_stack_pop(cpu));
+		age_6502__set_p(cpu, age_6502__stack_pop(cpu));
 		break;
 
 		//ROL
@@ -730,14 +730,14 @@ void age_6502_exec(struct age_6502* cpu)
 		//RTI
 	case 0x40:
 		cpu->cycle += 6;
-		age_6502_set_p(cpu, age_6502_stack_pop(cpu));
-		cpu->pc = age_6502_stack_pop16(cpu);
+		age_6502__set_p(cpu, age_6502__stack_pop(cpu));
+		cpu->pc = age_6502__stack_pop16(cpu);
 		break;
 
 		//RTS
 	case 0x60:
 		cpu->cycle += 6;
-		cpu->pc = age_6502_stack_pop16(cpu) + 1;
+		cpu->pc = age_6502__stack_pop16(cpu) + 1;
 		break;
 
 		//SBC
@@ -873,7 +873,7 @@ void age_6502_exec(struct age_6502* cpu)
 	}
 }
 
-void age_6502_print_status(struct age_6502* cpu)
+void age_6502__print_status(struct age_6502* cpu)
 {
 	printf("pc=%#06x sp=%#04x a=%#04x x=%#04x y=%#04x", cpu->pc, cpu->sp, cpu->a, cpu->x, cpu->y);
 }
