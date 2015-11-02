@@ -110,6 +110,15 @@ struct ag_surface32* ag_surface32__new_from_file(char* fname)
 	return surface;
 }
 
+/**
+ * Loads a file into a surface, replacing color_key with agc_transparent;
+ * 
+ * Currently only a subset of .bmp supported.
+ * \memberof ag_surface32
+ * @param fname Name of the file.
+ * @param color_key Color to be replaced with agc_transparent.
+ * @return The new surface.
+ */
 struct ag_surface32* ag_surface32__new_from_file_with_color_key(char* fname, struct ag_color32 color_key)
 {
 	//todo: check extension, and handle different formats, bmp only for now
@@ -138,7 +147,7 @@ struct ag_surface32* ag_surface32__new_from_file_with_color_key(char* fname, str
 		{
 			struct ag_color32 col = ag_color32(data[x*3+y*rowsize+2], data[x*3+y*rowsize+1], data[x*3+y*rowsize], 255);
 			if(ag_color32__is_equal(col, color_key))
-				surface->data[x+(surface->size.h-y-1)*surface->size.w] = ag_color32(0,0,0,0);
+				surface->data[x+(surface->size.h-y-1)*surface->size.w] = agc_transparent;
 			else
 				surface->data[x+(surface->size.h-y-1)*surface->size.w] = col;
 		}
@@ -252,6 +261,84 @@ void ag_surface32__blit_clipped_to(struct ag_surface32* dst, struct ag_surface32
 		src_size.y = clip_size.y;
 	if(src_size.x > 0 && src_size.y > 0)
 		ag_surface32__blit_partial_to(dst, src, dst_pos, src_pos, src_size);
+}
+
+/**
+ * Draws one surface onto another, using color key for transparency.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param color_key The color which will be considered transparent.
+ */
+void ag_surface32__blit_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color_key)
+{
+	ag_surface32__blit_partial_with_color_key_to(dst, src, dst_pos, ag_vec2i(0,0), src->size, color_key);
+}
+
+/**
+ * Draws a sub rectangle of one surface onto another, using color key for transparency.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param src_pos The position of the sub rectangle on the source surface.
+ * @param src_size The size of the sub rectangle on the source surface.
+ * @param color_key The color which will be considered transparent.
+ */
+void ag_surface32__blit_partial_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size, struct ag_color32 color_key)
+{
+	if(src_size.x > src->size.x - src_pos.x)
+		src_size.x = src->size.x - src_pos.x;
+	if(src_size.y > src->size.y - src_pos.y)
+		src_size.y = src->size.y - src_pos.y;
+	for(int y = 0; y < src_size.h; ++y)
+		for(int x = 0; x < src_size.w; ++x)
+		{
+			struct ag_color32 col = src->data[src_pos.x+x+(src_pos.y+y)*src->size.w];
+			if(!ag_color32__is_equal(col, color_key))
+				dst->data[dst_pos.x+x+(dst_pos.y+y)*dst->size.w] = col;
+		}
+}
+
+/**
+ * Draws one surface onto another, only drawing inside the target's clipping rectangle, using color key for transparency.
+ * \memberof ag_surface32
+ * @param dst The target surface.
+ * @param src The surface that will be drawn onto the target surface.
+ * @param dst_pos The position on the target surface.
+ * @param clip_pos The position of the clipping rectangle on the target surface.
+ * @param clip_size The size of the clipping rectangle on the target surface.
+ * @param color_key The color which will be considered transparent.
+ */
+void ag_surface32__blit_clipped_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size, struct ag_color32 color_key)
+{
+	struct ag_vec2i src_pos = ag_vec2i(0,0);
+	struct ag_vec2i src_size = src->size;
+	if(clip_pos.x > dst_pos.x)
+	{
+		src_pos.x = clip_pos.x - dst_pos.x;
+		dst_pos.x = clip_pos.x;
+	}
+	else
+		clip_size.x -= dst_pos.x-clip_pos.x;
+	if(clip_pos.y > dst_pos.y)
+	{
+		src_pos.y = clip_pos.y - dst_pos.y;
+		dst_pos.y = clip_pos.y;
+	}
+	else
+		clip_size.y -= dst_pos.y-clip_pos.y;
+
+	 //image size
+
+	 //clip size from img pos
+	if(src_size.x > clip_size.x)
+		src_size.x = clip_size.x;
+	if(src_size.y > clip_size.y)
+		src_size.y = clip_size.y;
+	if(src_size.x > 0 && src_size.y > 0)
+		ag_surface32__blit_partial_with_color_key_to(dst, src, dst_pos, src_pos, src_size, color_key);
 }
 
 /**

@@ -52,6 +52,10 @@ void ag_surface32__clear(struct ag_surface32* surface, struct ag_color32 color);
 void ag_surface32__blit_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos);
 void ag_surface32__blit_partial_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size);
 void ag_surface32__blit_clipped_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size);
+void ag_surface32__blit_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color_key);
+void ag_surface32__blit_partial_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i src_pos, struct ag_vec2i src_size, struct ag_color32 color_key);
+void ag_surface32__blit_clipped_with_color_key_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_vec2i clip_pos, struct ag_vec2i clip_size, struct ag_color32 color_key);
+
 void ag_surface32__blit_with_alphachan_as_color_to(struct ag_surface32* dst, struct ag_surface32* src, struct ag_vec2i dst_pos, struct ag_color32 color);
 
 
