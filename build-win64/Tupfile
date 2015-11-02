@@ -2,5 +2,5 @@
 : build/*.o |> x86_64-w64-mingw32-ar rcs %o %f |> libathgame.a
 : foreach ../src/*.c |> x86_64-w64-mingw32-clang -c -DPLATFORM_WIN32 -std=gnu99 -O0 -g %f -Werror -Wall -I../include -o %o |> build/%B.o_dbg
 : build/*.o_dbg |> x86_64-w64-mingw32-ar rcs %o %f |> libathgame_dbg.a
-: libathgame.a ../test/test.c |> x86_64-w64-mingw32-clang -DPLATFORM_WIN32 -std=gnu99 -O3 ../test/test.c -Werror -Wall -L. -lathgame -lws2_32 -lwinmm -lgdi32 -I../include -o %o |> test
-: libathgame_dbg.a ../test/test.c |> x86_64-w64-mingw32-clang -DPLATFORM_WIN32 -std=gnu99 -O0 -g ../test/test.c -Werror -Wall -L. -lathgame_dbg -lws2_32 -lwinmm -lgdi32 -I../include -o %o |> test_dbg
+: libathgame.a ../test/test.c |> x86_64-w64-mingw32-clang -DPLATFORM_WIN32 -std=gnu99 -O3 ../test/test.c -Werror -Wall -L. -lathgame -lws2_32 -lwinmm -lgdi32 -I../include -o %o |> test.exe
+: libathgame_dbg.a ../test/test.c |> x86_64-w64-mingw32-clang -DPLATFORM_WIN32 -std=gnu99 -O0 -g ../test/test.c -Werror -Wall -L. -lathgame_dbg -lws2_32 -lwinmm -lgdi32 -I../include -o %o |> test_dbg.exe
