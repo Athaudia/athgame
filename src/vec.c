@@ -1,5 +1,6 @@
 #include "vec.h"
 
+#include <stdlib.h>
 #include "math.h"
 
 #define TAU 6.28318530718
@@ -7,6 +8,19 @@
 struct ag_vec2i ag_vec2i(int32_t x, int32_t y)
 {
 	return (struct ag_vec2i){.x=x, .y=y};
+}
+
+struct ag_vec2i* ag_vec2i__new(int32_t x, int32_t y)
+{
+	struct ag_vec2i* vec = (struct ag_vec2i*)malloc(sizeof(struct ag_vec2i));
+	vec->x = x;
+	vec->y = y;
+	return vec;
+}
+
+void ag_vec2i__destroy(struct ag_vec2i* vec)
+{
+	free(vec);
 }
 
 struct ag_vec2i ag_vec2i__add(struct ag_vec2i a, struct ag_vec2i b)
@@ -57,6 +71,19 @@ bool ag_vec2i__point_in_rect(struct ag_vec2i point, struct ag_vec2i rect_pos, st
 struct ag_vec2f ag_vec2f(float x, float y)
 {
 	return (struct ag_vec2f){.x=x, .y=y};
+}
+
+struct ag_vec2f* ag_vec2f__new(float x, float y)
+{
+	struct ag_vec2f* vec = (struct ag_vec2f*)malloc(sizeof(struct ag_vec2f));
+	vec->x = x;
+	vec->y = y;
+	return vec;
+}
+
+void ag_vec2f__destroy(struct ag_vec2f* vec)
+{
+	free(vec);
 }
 
 struct ag_vec2f ag_vec2f__from_angle(float angle) //in turns
