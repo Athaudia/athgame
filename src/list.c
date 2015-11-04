@@ -72,6 +72,36 @@ void ag_list__push_back(struct ag_list* list, void* data)
 	}
 }
 
+void* ag_list__pop_front(struct ag_list* list)
+{
+	if(!list->front)
+		return 0;
+	void* ret = list->front->data;
+	if(list->front->next)
+		list->front->next->previous = 0;
+	else
+		list->back = 0;
+	struct ag_list_elem* elem = list->front;
+	list->front = list->front->next;
+	ag_list_elem__destroy(elem);
+	return ret;
+}
+
+void* ag_list__pop_back(struct ag_list* list)
+{
+	if(!list->back)
+		return 0;
+	void* ret = list->back->data;
+	if(list->back->previous)
+		list->back->previous->next = 0;
+	else
+		list->front = 0;
+	struct ag_list_elem* elem = list->back;
+	list->back = list->back->previous;
+	ag_list_elem__destroy(elem);
+	return ret;
+}
+
 struct ag_list_iter* ag_list_iter__new(struct ag_list* list)
 {
 	struct ag_list_iter* iter = (struct ag_list_iter*)malloc(sizeof(struct ag_list_iter));

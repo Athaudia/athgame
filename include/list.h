@@ -15,6 +15,8 @@ struct ag_list* ag_list__new();
 void ag_list__destroy(struct ag_list* list);
 void ag_list__push_front(struct ag_list* list, void* data);
 void ag_list__push_back(struct ag_list* list, void* data);
+void* ag_list__pop_front(struct ag_list* list);
+void* ag_list__pop_back(struct ag_list* list);
 
 struct ag_list_iter* ag_list_iter__new(struct ag_list* list);
 void ag_list_iter__destroy(struct ag_list_iter* iter);
