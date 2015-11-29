@@ -11,6 +11,7 @@
 #include "list.h"
 #include "net.h"
 #include "platform.h"
+#include "process.h"
 #include "rng.h"
 #include "state.h"
 #include "surface.h"
