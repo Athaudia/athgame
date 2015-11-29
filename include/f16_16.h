@@ -21,4 +21,5 @@ struct f16_16 f16_16__add(struct f16_16 a, struct f16_16 b);
 struct f16_16 f16_16__sub(struct f16_16 a, struct f16_16 b);
 struct f16_16 f16_16__mul(struct f16_16 a, struct f16_16 b);
 struct f16_16 f16_16__div(struct f16_16 a, struct f16_16 b);
+struct f16_16 f16_16__sin(struct f16_16 a);
 double f16_16__to_double(struct f16_16 a);
